@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-func receiveMessages() string {
+var message  chan string
+
+func ReceiveMessages() {
 	//Make a connection
 	conn, err := amqp.Dial("amqp://guest:guest@192.168.1.106:5672/")
 	if err != nil {
@@ -38,7 +40,8 @@ func receiveMessages() string {
 			if err != nil {
 				fmt.Print(err.Error())
 			}
-			return string(msg.Body)
+			message <- string(msg.Body)
+
 		}
 		fmt.Println("------------------------------")
 
@@ -46,3 +49,14 @@ func receiveMessages() string {
 		defer conn.Close()
 	}
 }
+
+func insertInDB()  {
+	for{
+		select {
+		case recieved := <- message:
+			fmt.Println(recieved)
+		}
+	}
+}
+
+

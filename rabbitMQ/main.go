@@ -1,3 +1,5 @@
+// by Semyon
+
 package main
 
 import (

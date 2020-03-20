@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/semyon-dev/hackuniversity/websock"
+	"github.com/semyon-dev/hackuniversity/clickhouse/websock"
 )
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	//	if err := rows.Scan(&country, &os, &browser, &categories, &actionDay, &actionTime); err != nil {
 	//		log.Fatal(err)
 	//	}
-	//	log.Printf("country: %s, os: %d, browser: %d, categories: %v, action_day: %s, action_time: %s", country, os, browser, categories, actionDay, actionTime)
+	//	log.Printf("country: %s, os: %clickhouse, browser: %clickhouse, categories: %v, action_day: %s, action_time: %s", country, os, browser, categories, actionDay, actionTime)
 	//}
 	//
 	//if err := rows.Err(); err != nil {

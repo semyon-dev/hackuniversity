@@ -58,9 +58,9 @@ package websock
 //    var input = document.getElementById("input");
 //    var ws;
 //    var print = function(message) {
-//        var d = document.createElement("div");
-//        d.textContent = message;
-//        output.appendChild(d);
+//        var clickhouse = document.createElement("div");
+//        clickhouse.textContent = message;
+//        output.appendChild(clickhouse);
 //    };
 //    document.getElementById("open").onclick = function(evt) {
 //        if (ws) {
