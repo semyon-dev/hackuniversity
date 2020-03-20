@@ -1,12 +1,12 @@
-package rabbitMQ
+package main
 
 import (
 	"encoding/binary"
 	"fmt"
 	"github.com/streadway/amqp"
-	"log"
 	"math"
 	"math/rand"
+	"time"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	conn, _ := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	defer conn.Close()
 
-	//Ccreate a channel
+	//Create a channel
 	ch, _ := conn.Channel()
 	defer ch.Close()
 
@@ -32,19 +32,21 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
-	//Publish a message
-	body := generate()
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        float64ToByte(body),
-		})
-	log.Printf("Message: %s", body)
-
+	for {
+		//Publish a message
+		body := generate()
+		err = ch.Publish(
+			"",     // exchange
+			q.Name, // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        float64ToByte(body),
+			})
+		fmt.Println("Message:", body)
+		time.Sleep(1 * time.Second)
+	}
 }
 
 // генерируем рандомные параметры
