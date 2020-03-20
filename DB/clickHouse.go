@@ -1,4 +1,4 @@
-package DB
+package main
 
 import (
 	"database/sql"
@@ -9,11 +9,10 @@ import (
 
 var conn *sql.DB
 
-
-func Connect(){
+func Connect() {
 	var err error
 	conn, err = sql.Open("clickhouse", "tcp://192.168.1.106:8123?debug=true")
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -30,21 +29,19 @@ func Connect(){
 		) 
 	`)
 	//engine=Memory
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 	fmt.Println("connected successfully....")
 }
 
-
-func saveAll(data map[string]float32){
+func saveAll(data map[string]float32) {
 
 	var (
 		tx, _   = conn.Begin()
 		stmt, _ = tx.Prepare("INSERT INTO example (t1,t2,t3,t4,t5,t6,t7) VALUES (?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
-
 
 	stmt.Exec(
 		data["t1"],
@@ -54,17 +51,15 @@ func saveAll(data map[string]float32){
 		data["t5"],
 		data["t6"],
 		data["t7"],
-		);
+	)
 
 	if err := tx.Commit(); err != nil {
-			log.Fatal(err)
-		}
-
+		log.Fatal(err)
+	}
 
 }
 
-
-func GetLastData()map[string]float32{
+func GetLastData() map[string]float32 {
 	var data map[string]float32
 	rows, err := conn.Query("SELECT t1,t2,t3,t4,t5,t6,t7 FROM example Where id=(select max(id) from example)")
 	if err != nil {
@@ -73,15 +68,15 @@ func GetLastData()map[string]float32{
 	defer rows.Close()
 
 	var (
-		t1,t2,t3,t4,t5,t6,t7 float32
+		t1, t2, t3, t4, t5, t6, t7 float32
 	)
 
 	for rows.Next() {
 
-		if err := rows.Scan(&t1,&t2,&t3,&t4,&t5,&t6,&t7); err != nil {
+		if err := rows.Scan(&t1, &t2, &t3, &t4, &t5, &t6, &t7); err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("t1: %f, t2: %f, t3: %f, t4: %f, t5: %f, t6: %f,t7:%f", t1,t2,t3,t4,t5,t6,t7)
+		log.Printf("t1: %f, t2: %f, t3: %f, t4: %f, t5: %f, t6: %f,t7:%f", t1, t2, t3, t4, t5, t6, t7)
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
@@ -95,7 +90,5 @@ func GetLastData()map[string]float32{
 	data["t6"] = t6
 	data["t7"] = t7
 
-
 	return data
 }
-

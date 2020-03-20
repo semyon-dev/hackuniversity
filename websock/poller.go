@@ -1,7 +1,6 @@
 package websock
 
 import (
-	"awesomeProject4/DB"
 	"flag"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -62,30 +61,23 @@ func wsConnect(w http.ResponseWriter, r *http.Request) {
 }
 
 // send data recuirsively
-func sendData(conn *websocket.Conn){
+func sendData(conn *websocket.Conn) {
 
-	err:= conn.WriteJSON(DB.GetLastData())
-	if err!=nil{
+	err := conn.WriteJSON(DB.GetLastData())
+	if err != nil {
 		fmt.Println("err websock")
 		fmt.Println(err)
 		return
-	}else {
+	} else {
 		time.Sleep(3000)
 		sendData(conn)
 	}
 }
 
-
-
-
-
-
-
 func TestWS() {
 	flag.Parse()
 	log.SetFlags(0)
 	http.HandleFunc("/echo", echo)
-	http.HandleFunc("/getData",wsConnect)
+	http.HandleFunc("/getData", wsConnect)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
-

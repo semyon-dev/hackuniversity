@@ -7,14 +7,24 @@ import (
 	"time"
 )
 
+var conn *amqp.Connection
+var ch *amqp.Channel
+
 func main() {
 
 	//Make a connection
-	conn, _ := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	var err error
+	conn, err = amqp.Dial("amqp://guest:guest@localhost:5672/")
+	if err != nil {
+		fmt.Print(err.Error())
+	}
 	defer conn.Close()
 
 	//Create a channel
-	ch, _ := conn.Channel()
+	ch, err = conn.Channel()
+	if err != nil {
+		fmt.Print(err.Error())
+	}
 	defer ch.Close()
 
 	//Declare a queue
@@ -29,33 +39,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-
-	go func() {
-		for {
-			time.Sleep(5 * time.Second)
-			// We consume data from the queue named data using the channel we created in go.
-			msgs, err := ch.Consume("data", "", false, false, false, false, nil)
-
-			if err != nil {
-				fmt.Println("error consuming the queue: " + err.Error())
-			}
-
-			// We loop through the messages in the queue and print them in the console.
-			// The msgs will be a go channel, not an amqp channel
-			fmt.Println("------------------------------")
-			for msg := range msgs {
-				fmt.Println("message received: " + string(msg.Body))
-				err := msg.Ack(false)
-				if err != nil {
-					fmt.Print(err.Error())
-				}
-			}
-			fmt.Println("------------------------------")
-
-			// We close the connection after the operation has completed.
-			defer conn.Close()
-		}
-	}()
 
 	for {
 		//Publish a message
@@ -73,6 +56,7 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 }
+
 
 // генерируем рандомные параметры
 func generate() float64 {

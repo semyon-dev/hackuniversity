@@ -3,12 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/semyon-dev/hackuniversity/DB"
 	"github.com/semyon-dev/hackuniversity/websock"
 )
 
 func main() {
-
 
 	//var (
 	//	tx, _   = connect.Begin()
@@ -60,9 +58,7 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
-	go DB.Connect()
-
-
+	go Connect()
 
 	websock.TestWS()
 
