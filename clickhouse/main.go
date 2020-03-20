@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	. "github.com/semyon-dev/hackuniversity/clickhouse/connect"
 	"github.com/semyon-dev/hackuniversity/clickhouse/websock"
 )
 
