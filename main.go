@@ -1,9 +1,10 @@
 package main
 
 import (
-	"awesomeProject4/DB"
-	"awesomeProject4/websock"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/semyon-dev/hackuniversity/DB"
+	"github.com/semyon-dev/hackuniversity/websock"
 )
 
 func main() {
@@ -69,13 +70,9 @@ func main() {
 			"message": "pong",
 		})
 	})
-	r.Run()
-
-
-
-
-
+	err := r.Run()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 }
-
-
