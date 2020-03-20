@@ -3,7 +3,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/semyon-dev/hackuniversity/rabbitMQ/model"
 	"github.com/streadway/amqp"
 	"math/rand"
 	"time"
@@ -16,7 +18,7 @@ func main() {
 
 	//Make a connection
 	var err error
-	conn, err = amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err = amqp.Dial("amqp://guest:guest@192.168.1.106:5672/")
 	if err != nil {
 		fmt.Print(err.Error())
 	}
@@ -44,7 +46,7 @@ func main() {
 
 	for {
 		//Publish a message
-		body := fmt.Sprintf("%f", generate())
+		body := generate()
 		err = ch.Publish(
 			"",     // exchange
 			q.Name, // routing key
@@ -52,7 +54,7 @@ func main() {
 			false,  // immediate
 			amqp.Publishing{
 				ContentType: "text/plain",
-				Body:        []byte(body),
+				Body:        body,
 			})
 		fmt.Println("Message:", body)
 		time.Sleep(1 * time.Second)
@@ -60,8 +62,22 @@ func main() {
 }
 
 // генерируем рандомные параметры
-func generate() float64 {
+func generate() []byte {
 	min := 0.0
 	max := 100.0
-	return min + rand.Float64()*(max-min)
+	data := model.Data{
+		PRESSURE: rand.Float64() * (max - min),
+		HUMIDITY: rand.Float64() * (max - min),
+		TEMP_HOM: rand.Float64() * (max - min),
+		TEMP_WOR: rand.Float64() * (max - min),
+		LEVEL:    rand.Float64() * (max - min),
+		MASS:     rand.Float64() * (max - min),
+		WATER:    rand.Float64() * (max - min),
+		CO2:      rand.Float64() * (max - min),
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return jsonData
 }
