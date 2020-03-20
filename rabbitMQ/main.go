@@ -1,4 +1,4 @@
-package main
+package rabbitMQ
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func main() {
+func muin() {
 
 	//Make a connection
 	conn, _ := amqp.Dial("amqp://guest:guest@localhost:5672/")

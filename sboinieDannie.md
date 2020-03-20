@@ -1,1 +1,7 @@
-- t1 
+- t1 <10
+- t2 >90
+- t3 40<x<50
+- t4 <10 pisez
+- t5 >95 auchtung vse vzletit
+- t6 <20 ne och
+- t7 <10 
