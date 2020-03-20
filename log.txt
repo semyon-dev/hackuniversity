@@ -1,0 +1,5 @@
+[GIN-debug] GET    /                         --> main.main.func1 (4 handlers)
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN-debug] GET    /                         --> main.main.func1 (4 handlers)
+[GIN-debug] GET    /                         --> main.main.func1 (4 handlers)
+[GIN-debug] GET    /                         --> main.main.func1 (4 handlers)
