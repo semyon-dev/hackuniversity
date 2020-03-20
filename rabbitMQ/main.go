@@ -1,4 +1,4 @@
-package rabbitMQ
+package main
 
 import (
 	"fmt"
@@ -56,7 +56,6 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 }
-
 
 // генерируем рандомные параметры
 func generate() float64 {
