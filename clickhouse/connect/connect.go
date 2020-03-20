@@ -19,13 +19,14 @@ func Connect() {
 	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS example (
 			id serializable primary key, 
-			t1  float,
-			t2  float,
-			t3  float,
-			t4  float,
-			t5  float,
-			t6  float,
-			t7  float
+			PRESSURE  float,
+			HUMIDITY  float,
+			TEMP_HOME  float,
+			TEMP_WORK  float,
+			LEVELS  float,
+			MASS  float,
+			WATER  float,
+			CO2 float 
 		) 
 	`)
 	//engine=Memory
@@ -35,22 +36,24 @@ func Connect() {
 	fmt.Println("connected successfully....")
 }
 
-func saveAll(data map[string]float32) {
+func SaveAll(data map[string]float32) {
 
 	var (
 		tx, _   = conn.Begin()
+		// rewrite for standart
 		stmt, _ = tx.Prepare("INSERT INTO example (t1,t2,t3,t4,t5,t6,t7) VALUES (?, ?, ?, ?, ?, ?)")
 	)
 	defer stmt.Close()
 
 	stmt.Exec(
-		data["t1"],
-		data["t2"],
-		data["t3"],
-		data["t4"],
-		data["t5"],
-		data["t6"],
-		data["t7"],
+		data["PRESSURE"],
+		data["HUMIDITY"],
+		data["TEMP_HOME"],
+		data["TEMP_WORK"],
+		data["LEVELS"],
+		data["MASS"],
+		data["WATER"],
+		data["CO2"],
 	)
 
 	if err := tx.Commit(); err != nil {
