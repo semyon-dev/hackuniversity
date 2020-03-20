@@ -73,7 +73,7 @@ func generate() []byte {
 		LEVEL:    rand.Float64() * (max - min),
 		MASS:     rand.Float64() * (max - min),
 		WATER:    rand.Float64() * (max - min),
-		CO2:      rand.Float64() * (max - min),
+		LEVELCO2: rand.Float64() * (max - min),
 	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {

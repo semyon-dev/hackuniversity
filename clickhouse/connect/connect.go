@@ -56,7 +56,4 @@ func saveAll(data map[string]float32) {
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
-
 }
-
-
