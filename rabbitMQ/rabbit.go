@@ -4,7 +4,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func main() {
+func test() {
 
 	url := "amqp://guest:guest@localhost:5672"
 
