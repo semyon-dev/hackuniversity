@@ -1,25 +1,61 @@
 package rabbitMQ
 
 import (
+	"encoding/binary"
+	"fmt"
 	"github.com/streadway/amqp"
+	"log"
+	"math"
+	"math/rand"
 )
 
 func main() {
 
-	url := "amqp://guest:guest@localhost:5672"
+	//Make a connection
+	conn, _ := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	defer conn.Close()
 
-	// Connect to the rabbitMQ instance
-	connection, err := amqp.Dial(url)
-	// Create a channel from the connection. We'll use channels to access the data in the queue rather than the connection itself.
-	channel, err := connection.Channel()
+	//Ccreate a channel
+	ch, _ := conn.Channel()
+	defer ch.Close()
 
-	// We create an exchange that will bind to the queue to send and receive messages
-	err = channel.ExchangeDeclare("events", "topic", true, false, false, false, nil)
-
+	//Declare a queue
+	q, err := ch.QueueDeclare(
+		"data", // name of the queue
+		false,  // should the message be persistent? also queue will survive if the cluster gets reset
+		false,  // autodelete if there's no consumers (like queues that have anonymous names, often used with fanout exchange)
+		false,  // exclusive means I should get an error if any other consumer subsribes to this queue
+		false,  // no-wait means I don't want RabbitMQ to wait if there's a queue successfully setup
+		nil,    // arguments for more advanced configuration
+	)
 	if err != nil {
-		panic("could not open RabbitMQ channel:" + err.Error())
+		fmt.Println(err.Error())
 	}
-	if err != nil {
-		panic("could not establish connection with RabbitMQ:" + err.Error())
-	}
+
+	//Publish a message
+	body := generate()
+	err = ch.Publish(
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        float64ToByte(body),
+		})
+	log.Printf("Message: %s", body)
+
+}
+
+// генерируем рандомные параметры
+func generate() float64 {
+	min := 0.0
+	max := 100.0
+	return min + rand.Float64()*(max-min)
+}
+
+func float64ToByte(f float64) []byte {
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], math.Float64bits(f))
+	return buf[:]
 }
