@@ -4,14 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
+	_ 	"github.com/ClickHouse/clickhouse-go"
+
 )
 
 var conn *sql.DB
 
 
-func connect(){
+func Connect(){
 	var err error
-	conn, err = sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
+	conn, err = sql.Open("clickhouse", "tcp://192.168.1.106:8123?debug=true")
 	if err!=nil{
 		panic(err)
 	}

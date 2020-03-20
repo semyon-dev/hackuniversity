@@ -1,43 +1,12 @@
 package main
+
 import (
-	"database/sql"
-	"fmt"
-	"log"
-
-	"github.com/ClickHouse/clickhouse-go"
-    "github.com/gin-gonic/gin"
-
+	"awesomeProject4/DB"
+	"awesomeProject4/websock"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := connect.Ping(); err != nil {
-		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
-		} else {
-			fmt.Println(err)
-		}
-		return
-	}
-
-	_, err = connect.Exec(`
-		CREATE TABLE IF NOT EXISTS example (
-			t1  float,
-			t2  float,
-			t3  float,
-			t4  float,
-			t5  float,
-			t6  float,
-			t7  float
-		) engine=Memory
-	`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	//
 	//var (
@@ -90,6 +59,9 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
+	DB.Connect()
+
+	websock.TestWS()
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
