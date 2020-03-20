@@ -32,7 +32,7 @@ func Test() {
 	}
 
 	// Language=SQL
-	//db.Exec("drop table users")
+	//clickhouse.Exec("drop table users")
 
 	var initdb = "create table if not exists users ( id SERIAL PRIMARY KEY,us_name VARCHAR(30), age INT )"
 	_, err = db.Exec(initdb)
@@ -41,7 +41,7 @@ func Test() {
 	}
 
 	//
-	//_,err = db.Exec("INSERT INTO users(us_name, age) VALUES ('QWERTY',23)")
+	//_,err = clickhouse.Exec("INSERT INTO users(us_name, age) VALUES ('QWERTY',23)")
 	//if err!=nil{
 	//	fmt.Println( string(err.Error()) +"  qwertyukgfjh")
 	//}
@@ -59,7 +59,7 @@ func Test() {
 		println(tstr + " - choto")
 	}
 
-	// test db 2
+	// test clickhouse 2
 	// Language=SQL
 	var initdb2 = "CREATE TABLE IF NOT EXISTS jusers(id SERIAL PRIMARY KEY, name VARCHAR(30), skills json)"
 	_, err = db.Exec(initdb2)

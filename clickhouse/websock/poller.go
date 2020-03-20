@@ -1,6 +1,7 @@
 package websock
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -60,10 +61,46 @@ func wsConnect(w http.ResponseWriter, r *http.Request) {
 	//}
 }
 
+var conn *sql.DB
+
+func GetLastData() map[string]float32 {
+	var data map[string]float32
+	rows, err := conn.Query("SELECT t1,t2,t3,t4,t5,t6,t7 FROM example Where id=(select max(id) from example)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var (
+		t1, t2, t3, t4, t5, t6, t7 float32
+	)
+
+	for rows.Next() {
+
+		if err := rows.Scan(&t1, &t2, &t3, &t4, &t5, &t6, &t7); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("t1: %f, t2: %f, t3: %f, t4: %f, t5: %f, t6: %f,t7:%f", t1, t2, t3, t4, t5, t6, t7)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	data["t1"] = t1
+	data["t2"] = t2
+	data["t3"] = t3
+	data["t4"] = t4
+	data["t5"] = t5
+	data["t6"] = t6
+	data["t7"] = t7
+
+	return data
+}
+
 // send data recuirsively
 func sendData(conn *websocket.Conn) {
 
-	err := conn.WriteJSON(DB.GetLastData())
+	err := conn.WriteJSON(GetLastData())
 	if err != nil {
 		fmt.Println("err websock")
 		fmt.Println(err)
