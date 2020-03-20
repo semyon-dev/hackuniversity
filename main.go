@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	//
+
 	//var (
 	//	tx, _   = connect.Begin()
 	//	stmt, _ = tx.Prepare("INSERT INTO example (country_code, os_id, browser_id, categories, action_day, action_time) VALUES (?, ?, ?, ?, ?, ?)")
@@ -60,7 +60,9 @@ func main() {
 	//	log.Fatal(err)
 	//}
 
-	DB.Connect()
+	go DB.Connect()
+
+
 
 	websock.TestWS()
 
