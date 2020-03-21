@@ -68,7 +68,7 @@ var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=di
 
 func clickConnect() {
 	var err error
-	clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.109:8123?debug=true")
+	clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.109:9000?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go"
+	_ "github.com/ClickHouse/clickhouse-go"
 	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
-	"os"
 	"time"
 )
 
@@ -14,20 +14,17 @@ var conn *sql.DB
 
 func Connect() {
 	var err error
-	ip := os.Getenv("LOCAL_IP")
-	if len(ip) == 0 {
-		ip = "192.168.1.109"
-	}
-	conn, err = sql.Open("clickhouse", "tcp://"+ip+":8123?debug=true")
+	// Димин порт
+	ip := "192.168.1.109"
+	conn, err = sql.Open("clickhouse", "tcp://"+ip+":9000?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("-------------------")
 	if err := conn.Ping(); err != nil {
+		fmt.Println("error connect to clickhouse:", err)
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
-		} else {
-			fmt.Println("err", err)
 		}
 	}
 	fmt.Println("-------------------")
