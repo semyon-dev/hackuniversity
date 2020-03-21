@@ -9,7 +9,6 @@ import (
 func main() {
 	r := gin.Default()
 
-
 	connect()
 
 	r.POST("/criticals", func(context *gin.Context) {
@@ -36,7 +35,7 @@ func connect() {
 			maximum float ,
 			minimum float ,
 			
-		) engine=Memory
+		) 
 	`)
 
 	//engine=Memory
