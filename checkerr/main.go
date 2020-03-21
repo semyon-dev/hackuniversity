@@ -47,7 +47,7 @@ func checkCriticalParameters(jsonData []byte) {
 
 	criticals := db.GetCriticals()
 
-	if (data.HUMIDITY<criticals["HUMIDITY"]["min"]) && (data.HUMIDITY>criticals["HUMIDITY"]["max"]){
+	if (data.HUMIDITY<criticals["HUMIDITY"]["min"]) || (data.HUMIDITY>criticals["HUMIDITY"]["max"]){
 		Log.Error("HUMIDITY - over normal value")
 				err := db.InsertError("HUMIDITY", "over normal value", data.HUMIDITY)
 				if err != nil {
@@ -55,7 +55,7 @@ func checkCriticalParameters(jsonData []byte) {
 				}
 	}
 
-	if (data.LEVELCO2<criticals["LEVELCO2"]["min"]) && (data.HUMIDITY>criticals["LEVELCO2"]["max"]){
+	if (data.LEVELCO2<criticals["LEVELCO2"]["min"]) || (data.HUMIDITY>criticals["LEVELCO2"]["max"]){
 		Log.Error("LEVELCO2 - over normal value")
 		err := db.InsertError("LEVELCO2", "over normal value", data.LEVELCO2)
 		if err != nil {
@@ -63,7 +63,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.LEVELPH<criticals["LEVELPH"]["min"]) && (data.LEVELPH>criticals["LEVELPH"]["max"]){
+	if (data.LEVELPH<criticals["LEVELPH"]["min"]) || (data.LEVELPH>criticals["LEVELPH"]["max"]){
 		Log.Error("LEVELPH - over normal value")
 		err := db.InsertError("LEVELPH", "over normal value", data.LEVELPH)
 		if err != nil {
@@ -71,7 +71,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.MASS<criticals["MASS"]["min"]) && (data.MASS>criticals["MASS"]["max"]){
+	if (data.MASS<criticals["MASS"]["min"]) || (data.MASS>criticals["MASS"]["max"]){
 		Log.Error("MASS - over normal value")
 		err := db.InsertError("MASS", "over normal value", data.MASS)
 		if err != nil {
@@ -79,7 +79,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.PRESSURE<criticals["PRESSURE"]["min"]) && (data.MASS>criticals["PRESSURE"]["max"]){
+	if (data.PRESSURE<criticals["PRESSURE"]["min"]) || (data.MASS>criticals["PRESSURE"]["max"]){
 		Log.Error("PRESSURE - over normal value")
 		err := db.InsertError("PRESSURE", "over normal value", data.PRESSURE)
 		if err != nil {
@@ -87,7 +87,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.WATER<criticals["WATER"]["min"]) && (data.MASS>criticals["WATER"]["max"]){
+	if (data.WATER<criticals["WATER"]["min"]) || (data.MASS>criticals["WATER"]["max"]){
 		Log.Error("WATER - over normal value")
 		err := db.InsertError("WATER", "over normal value", data.WATER)
 		if err != nil {
@@ -95,7 +95,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.TEMPHOME<criticals["TEMPHOME"]["min"]) && (data.MASS>criticals["TEMPHOME"]["max"]){
+	if (data.TEMPHOME<criticals["TEMPHOME"]["min"]) || (data.MASS>criticals["TEMPHOME"]["max"]){
 		Log.Error("TEMPHOME - over normal value")
 		err := db.InsertError("TEMPHOME", "over normal value", data.TEMPHOME)
 		if err != nil {
@@ -103,7 +103,7 @@ func checkCriticalParameters(jsonData []byte) {
 		}
 	}
 
-	if (data.TEMPWORK<criticals["TEMPWORK"]["min"]) && (data.MASS>criticals["TEMPWORK"]["max"]){
+	if (data.TEMPWORK<criticals["TEMPWORK"]["min"]) || (data.MASS>criticals["TEMPWORK"]["max"]){
 		Log.Error("TEMPWORK - over normal value")
 		err := db.InsertError("TEMPWORK", "over normal value", data.TEMPWORK)
 		if err != nil {
