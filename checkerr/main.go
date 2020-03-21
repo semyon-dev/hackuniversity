@@ -33,16 +33,6 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("recv: %s", message)
 		checkCriticalParameters(message)
-
-		//for _, Connection := range Connections {
-		//	if Connection != c {
-		//		err = Connection.WriteMessage(mt, message)
-		//		if err != nil {
-		//			log.Println("write:", err)
-		//			break
-		//		}
-		//	}
-		//}
 	}
 }
 
