@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var addr = flag.String("addr", "localhost:8080", "http service address")
+var addr = flag.String("addr", os.Getenv("LOCAL_IP")+":8080", "http service address")
 
 func Run() {
 	flag.Parse()
@@ -55,7 +55,7 @@ func Run() {
 		case t := <-ticker.C:
 			dataJson, data := generate.NewData()
 			// отправялемь данные сразу и в бд и в вебсокет
-			go db.Save(data)
+			db.Save(data)
 			err := c.WriteMessage(websocket.TextMessage, dataJson)
 			_ = t
 			//fmt.Println(t.String())

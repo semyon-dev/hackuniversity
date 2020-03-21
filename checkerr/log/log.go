@@ -18,8 +18,6 @@ func Logging() {
 	// Note that this does add measurable overhead
 	//Log.SetReportCaller(true)
 
-	fmt.Println("-f")
-
 	hook, err := telegram_hook.NewTelegramHook(
 		"checkerr",
 		"1084260162:AAGyxgi6R_kcnx-TA7caQoTZvrPP2P-FN5c",

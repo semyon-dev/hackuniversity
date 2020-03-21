@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 )
 
 var conn *sql.DB
@@ -17,7 +18,23 @@ func Connect() {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println("postgres connect")
+		fmt.Println("postgres connect success")
+	}
+	if err != nil {
+		fmt.Println("error", err)
+	}
+
+	_, err := conn.Exec(`
+		CREATE TABLE IF NOT EXISTS criticals (
+			id serial primary key, 
+			paramname varchar(20),
+			maximum float ,
+			minimum float 
+		)
+	`)
+
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	_, err = conn.Exec(`CREATE TABLE IF NOT EXISTS errors(
@@ -25,14 +42,13 @@ func Connect() {
  					dateTime Date,
  					paramName varchar(20),
  					paramValue float8,
- 					message text
- 					   
+ 					message text			   
 		)
 `)
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
-		fmt.Println("CREATE table success")
+		fmt.Println("table errrors success")
 	}
 }
 

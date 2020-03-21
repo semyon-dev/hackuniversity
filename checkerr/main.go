@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,14 +9,12 @@ import (
 	. "github.com/semyon-dev/hackuniversity/checkerr/log"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-var addr = flag.String("addr", "localhost:8080", "http service address")
-
-var conn *sql.DB
-
+var addr = flag.String("addr", os.Getenv("LOCAL_IP")+":8080", "http service address")
 var upgrader = websocket.Upgrader{} // use default options
 
 func echo(w http.ResponseWriter, r *http.Request) {
@@ -28,25 +25,25 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
-	//for {
-	//	_, message, err := c.ReadMessage()
-	//	if err != nil {
-	//		log.Println("read:", err)
-	//		break
-	//	}
-	//	log.Printf("recv: %s", message)
-	//	checkCriticalParameters(message)
-	//
-	//	//for _, Connection := range Connections {
-	//	//	if Connection != c {
-	//	//		err = Connection.WriteMessage(mt, message)
-	//	//		if err != nil {
-	//	//			log.Println("write:", err)
-	//	//			break
-	//	//		}
-	//	//	}
-	//	//}
-	//}
+	for {
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+		log.Printf("recv: %s", message)
+		checkCriticalParameters(message)
+
+		//for _, Connection := range Connections {
+		//	if Connection != c {
+		//		err = Connection.WriteMessage(mt, message)
+		//		if err != nil {
+		//			log.Println("write:", err)
+		//			break
+		//		}
+		//	}
+		//}
+	}
 }
 
 func checkCriticalParameters(jsonData []byte) {

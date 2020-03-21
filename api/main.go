@@ -50,7 +50,7 @@ func main() {
 	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
-var connStr = "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
+var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 func connect() {
 	var err error
@@ -60,10 +60,10 @@ func connect() {
 	}
 
 	res, err := conn.Exec(`
-		CREATE TABLE IF NOT EXISTS  criticals (
+		CREATE TABLE IF NOT EXISTS criticals (
 			id serial primary key, 
 			paramname varchar(20),
-			maximum float ,
+			maximum float,
 			minimum float 
 		)
 	`)
