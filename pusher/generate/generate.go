@@ -8,6 +8,8 @@ import (
 )
 
 // генерируем рандомные параметры (типа OPC Server)
+// УСТАРЕЛО! вместо это используем opc симулятор (opc.go)!
+// Deprecated:
 func NewData() ([]byte, model.Data) {
 	min := 0.0
 	max := 100.0
