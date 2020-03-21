@@ -37,7 +37,9 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func checkCriticalParameters(jsonData []byte) {
+
+// old not used version
+func checkCriticalParameters2(jsonData []byte) {
 	var data model.Data
 	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
@@ -111,7 +113,37 @@ func checkCriticalParameters(jsonData []byte) {
 	}
 }
 
+func checkCriticalParameters(jsonData []byte) {
+	var data model.Data
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		fmt.Println(err)
+	}
 
+	criticals := db.GetCriticals()
+
+	checkValues("TEMPWORK",criticals,data.TEMPWORK)
+	checkValues("TEMPHOME",criticals,data.TEMPHOME)
+	checkValues("WATER",criticals,data.WATER)
+	checkValues("PRESSURE",criticals,data.PRESSURE)
+	checkValues("MASS",criticals,data.MASS)
+	checkValues("LEVELPH",criticals,data.LEVELPH)
+	checkValues("LEVELCO2",criticals,data.LEVELCO2)
+	checkValues("HUMIDITY",criticals,data.HUMIDITY)
+
+
+
+}
+
+func checkValues(name string,dict map[string]map[string]float64,value float64){
+	if (value < dict[name]["min"]) || (value > dict[name]["max"]) {
+		Log.Error(" - over normal value")
+		err := db.InsertError(name, "over normal value", value)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
 
 
 
