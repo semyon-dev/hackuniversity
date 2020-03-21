@@ -24,7 +24,7 @@ func connect() {
 	var err error
 
 	// language=SQL
-	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
+	connStr := "host=192.168.99.1 port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
 
 	conn, err = sql.Open("postgres", connStr)
 	if err != nil {
@@ -76,6 +76,7 @@ func getCriticals() map[string]map[string]float64 {
 }
 
 func echo(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -132,7 +133,6 @@ func checkCriticalParameters(jsonData []byte) {
 
 func main() {
 	connect()
-
 	Logging()
 	flag.Parse()
 	log.SetFlags(0)
