@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -11,6 +12,7 @@ var conn *sql.DB
 
 func main() {
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	connect()
 
@@ -28,12 +30,16 @@ func main() {
 	r.POST("/critical", func(context *gin.Context) {
 
 		var critical Criticals
-		context.BindJSON(&critical)
-		err := updateCritical(critical.Name, critical.Min, critical.Max)
+		err := context.ShouldBindJSON(&critical)
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = updateCritical(critical.Name, critical.Min, critical.Max)
 		if err != nil {
 			context.JSON(500, gin.H{
 				"status": "ERROR",
 			})
+			fmt.Println(err)
 		} else {
 			context.JSON(200, gin.H{
 				"status": "OK",
@@ -107,13 +113,16 @@ func insertMinMax(name string, min float64, max float64) {
 }
 
 type Criticals struct {
-	Name string  `json:"name"`
+	Name string  `json:"param"`
 	Min  float64 `json:"min"`
 	Max  float64 `json:"max"`
 }
 
 func updateCritical(name string, min, max float64) error {
-	_, err := conn.Exec("UPDATE criticals SET paramname = $1,minimum = $2,maximum = $3")
+
+	fmt.Println(name)
+
+	_, err := conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
 	return err
 }
 
