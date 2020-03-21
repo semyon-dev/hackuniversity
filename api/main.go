@@ -117,14 +117,28 @@ func main() {
 
 func nameDateTimes(context *gin.Context) (string, string, string) {
 
+	currentTime:=time.Now().String()
+	strCurrTime:= strings.Split(currentTime,".")[0]
+	fmt.Println( strCurrTime + " - curtaim")
+
 	name := context.Query("paramName")
 	dateStart := context.Query("dateStart")
-	dateEnd := context.Query("dateEnd")
-	timeStart := context.Query("timeStart")
-	timeEnd := context.Query("timeEnd")
+	var dateTimeStart, dateTimeEnd string
+	if dateStart=="today" {
+		fmt.Println(" -----===========-=-=-=-")
+		dateTimeStart = strings.Split(strCurrTime," ")[0]+" 00:00:00"
+		dateTimeEnd = strCurrTime
+	}else{
+		dateEnd := context.Query("dateEnd")
+		timeStart := context.Query("timeStart")
+		timeEnd := context.Query("timeEnd")
 
-	dateTimeStart := dateStart + " " + timeStart
-	dateTimeEnd := dateEnd + " " + timeEnd
+		dateTimeStart = dateStart + " " + timeStart
+		dateTimeEnd = dateEnd + " " + timeEnd
+	}
+
+	fmt.Println(dateTimeStart+"|",dateTimeEnd+"|"," - times!@!@@@")
+
 	return name, dateTimeStart, dateTimeEnd
 }
 
