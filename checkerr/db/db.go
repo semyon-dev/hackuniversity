@@ -72,12 +72,11 @@ func GetCriticals() map[string]map[string]float64 {
 	var name string
 	var min, max float64
 	for rows.Next() {
-		err = rows.Scan(&name, &min, &max)
-		if err!=nil{
+		err := rows.Scan(&name, &min, &max)
+		if err != nil {
 			fmt.Println("error in scaning values in checkerr")
 		}
 		criticals[name] = map[string]float64{"min": min, "max": max}
 	}
-
 	return criticals
 }
