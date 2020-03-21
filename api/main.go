@@ -61,10 +61,10 @@ func main() {
 		timeStart := context.Query("timeStart")
 		timeEnd := context.Query("timeEnd")
 
-		dateTimeStart:=dateStart+" "+timeStart
-		dateTimeEnd:=dateEnd+" "+timeEnd
+		dateTimeStart := dateStart + " " + timeStart
+		dateTimeEnd := dateEnd + " " + timeEnd
 
-		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		params := averageValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
@@ -78,10 +78,6 @@ func main() {
 		fmt.Println("ошибка при запуске API", err)
 	}
 }
-
-
-
-
 
 var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
@@ -173,28 +169,26 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-
-
 func averageValue(paramName, dateStart, dateEnd string) []float32 {
-		execStr:="SELECT avg("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 
-		fmt.Println(execStr + " - !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		rows, err := clicconn.Query(execStr)
-		if err != nil {
-			panic(err)
-		}
+	fmt.Println(execStr + " - !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	rows, err := clicconn.Query(execStr)
+	if err != nil {
+		panic(err)
+	}
 
-		var val float32
-		var allParams []float32
-		for rows.Next() {
-			rows.Scan(&val)
-			allParams = append(allParams, val)
-		}
-		return allParams
+	var val float32
+	var allParams []float32
+	for rows.Next() {
+		rows.Scan(&val)
+		allParams = append(allParams, val)
+	}
+	return allParams
 }
 
 func maxValue(paramName, dateStart, dateEnd string) float32 {
-	rows, err := clicconn.Query("SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	rows, err := clicconn.Query("SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart, dateEnd)
 	if err != nil {
 		panic(err)
 	}
@@ -208,7 +202,7 @@ func maxValue(paramName, dateStart, dateEnd string) float32 {
 }
 
 func minValue(paramName, dateStart, dateEnd string) float32 {
-	rows, err := clicconn.Query("SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	rows, err := clicconn.Query("SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart, dateEnd)
 	if err != nil {
 		panic(err)
 	}
@@ -220,11 +214,6 @@ func minValue(paramName, dateStart, dateEnd string) float32 {
 
 	return val
 }
-
-
-
-
-
 
 func newDate(date string) Date {
 	vals := strings.Split(date, ".")
@@ -269,8 +258,6 @@ type Criticals struct {
 }
 
 func updateCritical(name string, min, max float64) error {
-
-	fmt.Println(name)
 
 	_, err := conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
 	return err

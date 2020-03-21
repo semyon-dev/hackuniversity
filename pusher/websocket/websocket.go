@@ -33,18 +33,18 @@ func Run() {
 	if err != nil {
 		log.Println("fatal error: dial:", err)
 	}
-	//defer c.Close()
+	defer c.Close()
 
 	cDima, _, err := websocket.DefaultDialer.Dial(uDima.String(), nil)
 	if err != nil {
 		log.Println("error: dial:", err)
 	}
-	//defer c.Close()
+	defer c.Close()
 
 	done := make(chan struct{})
 
 	ticker := time.NewTicker(time.Second)
-	//defer ticker.Stop()
+	defer ticker.Stop()
 
 	for {
 		select {
