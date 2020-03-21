@@ -15,6 +15,9 @@ var conn *sql.DB
 func Connect() {
 	var err error
 	ip := os.Getenv("LOCAL_IP")
+	if len(ip) == 0 {
+		ip = "192.168.1.106"
+	}
 	conn, err = sql.Open("clickhouse", "tcp://"+ip+":8123?debug=true")
 	if err != nil {
 		log.Fatal(err)

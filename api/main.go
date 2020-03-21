@@ -52,6 +52,19 @@ func main() {
 			})
 		}
 	})
+	
+	r.GET("/period", func(context *gin.Context) {
+		name:=context.Query("paramName")
+		dateStart:=context.Query("dateStart")
+		dateEnd:=context.Query("dateEnd")
+		params:=getParamForPeriod(name,dateStart,dateEnd)
+		context.JSON(200,
+			gin.H{
+				"parameters":params,
+			})
+	})
+	
+	
 
 	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
@@ -146,62 +159,59 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-func getParamForPeriod(paramName,dateStart, dateEnd string)[]float32 {
-	if dateEnd == "now" {
-		rows,err:=clicconn.Query("SELECT $1 FROM journal WHERE action_time > $2",paramName,dateStart)
-		if err!=nil{
+func (date *Date)toString()string{
+	s:=""
+	s+=strconv.Itoa(date.day)+"."
+	s+=strconv.Itoa(date.month)+"."
+	s+=strconv.Itoa(date.year)
+	return s
+}
+
+func getParamForPeriod(paramName, dateStart, dateEnd string) []float32 {
+	
+		rows, err := clicconn.Query("SELECT avg($1) FROM journal where action_time>$2 and action_time<$3 GROUP BY action_time", paramName, dateStart,dateEnd)
+		if err != nil {
 			panic(err)
 		}
 
 		var val float32
 		var allParams []float32
-		for rows.Next(){
+		for rows.Next() {
 			rows.Scan(&val)
-			allParams = append(allParams,val)
+			allParams = append(allParams, val)
 		}
 		return allParams
-	}else{
-
-		return []float32{1,2,3}
-	}
 }
 
-func newDate(date string)Date{
-	vals:=strings.Split(date,".")
+func newDate(date string) Date {
+	vals := strings.Split(date, ".")
 
-	day,err:=strconv.Atoi( vals[0])
-	if err!=nil{
+	day, err := strconv.Atoi(vals[0])
+	if err != nil {
 		fmt.Println(err)
 	}
-	month,err:=strconv.Atoi( vals[0])
-	if err!=nil{
+	month, err := strconv.Atoi(vals[0])
+	if err != nil {
 		fmt.Println(err)
 	}
-	year,err:=strconv.Atoi( vals[0])
-	if err!=nil{
+	year, err := strconv.Atoi(vals[0])
+	if err != nil {
 		fmt.Println(err)
 	}
-	return Date{day: day,month:month,year:year}
+	return Date{day: day, month: month, year: year}
 }
 
-
-type Date struct{
-	day,month,year int
+type Date struct {
+	day, month, year int
 }
 
-func daysBetween(dateStart,dateEnd Date){
-	date1:=time.Date(dateStart.year,time.Month(dateStart.month),dateStart.day,0,0,0,0,time.UTC)
-	date2:=time.Date(dateEnd.year,time.Month(dateEnd.month),dateEnd.day,0,0,0,0,time.UTC)
-	days:=int(date2.Sub(date1))
+func daysBetween(dateStart, dateEnd Date)int {
+	date1 := time.Date(dateStart.year, time.Month(dateStart.month), dateStart.day, 0, 0, 0, 0, time.UTC)
+	date2 := time.Date(dateEnd.year, time.Month(dateEnd.month), dateEnd.day, 0, 0, 0, 0, time.UTC)
+	days := int(date2.Sub(date1))
 	fmt.Println(days)
+	return days
 }
-
-
-
-
-
-
-
 
 func insertMinMax(name string, min float64, max float64) {
 	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
