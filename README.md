@@ -13,7 +13,7 @@ JS OPC UA
 # Микросервисы
 ## pusher
 `go run pusher/main.go` \
-Pusher получает данные с OPC server и отдает их по вебсокетам другим микросервисам
+Pusher получает данные с OPC server, записывает в clickhouse и отдает их по вебсокетам другим микросервисам
 
 ## checkerr
 `go run checkerr/main.go` \
