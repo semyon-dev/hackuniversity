@@ -31,20 +31,20 @@ func Run() {
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Println("fatal error: dial:", err)
 	}
-	defer c.Close()
+	//defer c.Close()
 
 	cDima, _, err := websocket.DefaultDialer.Dial(uDima.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Println("error: dial:", err)
 	}
-	defer c.Close()
+	//defer c.Close()
 
 	done := make(chan struct{})
 
 	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
+	//defer ticker.Stop()
 
 	for {
 		select {
@@ -59,9 +59,9 @@ func Run() {
 				log.Println("write:", err)
 				return
 			}
+			// отправляем вебскоеты на другой микросервис (Диме)
 			err = cDima.WriteMessage(websocket.TextMessage, dataJson)
 			_ = t
-			//fmt.Println(t.String())
 			if err != nil {
 				log.Println("write:", err)
 				return
