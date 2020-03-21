@@ -24,7 +24,7 @@ func Connect() {
 		fmt.Println("error", err)
 	}
 
-	_, err := conn.Exec(`
+	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS criticals (
 			id serial primary key, 
 			paramname varchar(20),
