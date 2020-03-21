@@ -73,9 +73,23 @@ func main() {
 		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
 		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
 
-		//params := minValue()
+		params := maxValue(name, dateTimeStart, dateTimeEnd)
+		context.JSON(200,
+			gin.H{
+				"parameters": params,
+			})
+	})
 
 
+	r.GET("/min", func(context *gin.Context) {
+		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+
+		params := minValue(name, dateTimeStart, dateTimeEnd)
+		context.JSON(200,
+			gin.H{
+				"parameters": params,
+			})
 	})
 
 	err := r.Run(":5000")
