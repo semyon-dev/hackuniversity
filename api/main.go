@@ -218,7 +218,7 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-func averageValue(paramName, dateStart, dateEnd string) []float32 {
+func averageValue(paramName, dateStart, dateEnd string) float32 {
 	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 
 	fmt.Println(execStr + " - !!!!")
@@ -228,12 +228,10 @@ func averageValue(paramName, dateStart, dateEnd string) []float32 {
 	}
 
 	var val float32
-	var allParams []float32
 	for rows.Next() {
 		rows.Scan(&val)
-		allParams = append(allParams, val)
 	}
-	return allParams
+	return val
 }
 
 func maxValue(paramName, dateStart, dateEnd string) float32 {
