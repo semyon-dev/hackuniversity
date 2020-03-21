@@ -72,9 +72,11 @@ func GetCriticals() map[string]map[string]float64 {
 	var name string
 	var min, max float64
 	for rows.Next() {
-		rows.Scan(&name, &min, &max)
+		err := rows.Scan(&name, &min, &max)
+		if err != nil {
+			fmt.Println(err)
+		}
 		criticals[name] = map[string]float64{"min": min, "max": max}
-
 	}
 
 	return criticals
