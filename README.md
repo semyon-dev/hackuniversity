@@ -7,7 +7,7 @@ Clickhouse
 PostgresSQL
 OPC UA Simulator
 Gin
-gorilla websockets
+Gorilla websockets
 
 # Микросервисы
 ## pusher
