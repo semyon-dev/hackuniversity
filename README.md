@@ -24,5 +24,10 @@ checkerr получает данные с pusher (по websocket) и прове�
 `go run api/main.go` \
 API отвечает за изменение min и max параметров (критические параметры)
 
-# LICENSE
+## opc
+`npm install` \
+`node opc.js` \
+opc - симулятор opc ua server
+
+## LICENSE
 MIT
