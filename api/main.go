@@ -53,8 +53,7 @@ func main() {
 	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
-var connStr = "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
-
+var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 func clickConnect() {
 	var err error
@@ -92,14 +91,6 @@ func clickConnect() {
 	}
 }
 
-
-
-
-
-
-
-
-
 func connect() {
 	var err error
 	conn, err = sql.Open("postgres", connStr)
@@ -109,9 +100,11 @@ func connect() {
 
 	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS  criticals (
+	res, err := conn.Exec(
+		CREATE TABLE IF NOT EXISTS criticals (
 			id serial primary key, 
 			paramname varchar(20),
-			maximum float ,
+			maximum float,
 			minimum float 
 		)
 	`)
@@ -152,19 +145,12 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-
-func getParamForPeriod(dateStart,dateEnd string){
-	if dateEnd=="now"{
+func getParamForPeriod(dateStart, dateEnd string) {
+	if dateEnd == "now" {
 		clicconn.Exec("SELECT ")
 	}
 
 }
-
-
-
-
-
-
 
 func insertMinMax(name string, min float64, max float64) {
 	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)

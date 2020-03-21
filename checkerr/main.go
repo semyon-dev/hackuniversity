@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,26 +9,21 @@ import (
 	. "github.com/semyon-dev/hackuniversity/checkerr/log"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-var addr = flag.String("addr", "localhost:8080", "http service address")
-
-var conn *sql.DB
-
+var addr = flag.String("addr", os.Getenv("LOCAL_IP")+":8080", "http service address")
 var upgrader = websocket.Upgrader{} // use default options
-var Connections []*websocket.Conn
-
-
 
 func echo(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
-	Connections = append(Connections, c)
 	defer c.Close()
 	for {
 		_, message, err := c.ReadMessage()
@@ -64,7 +58,10 @@ func checkCriticalParameters(jsonData []byte) {
 
 func main() {
 	db.Connect()
+<<<<<<< HEAD
 
+=======
+>>>>>>> b60bf299463c665b3fe036eeacda51a3b9d54fd2
 	Logging()
 	flag.Parse()
 	log.SetFlags(0)

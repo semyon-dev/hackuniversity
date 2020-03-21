@@ -16,7 +16,7 @@ func Logging() {
 
 	// If you wish to add the calling method as a field, instruct the logger via:
 	// Note that this does add measurable overhead
-	Log.SetReportCaller(true)
+	//Log.SetReportCaller(true)
 
 	hook, err := telegram_hook.NewTelegramHook(
 		"checkerr",

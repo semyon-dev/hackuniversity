@@ -6,18 +6,21 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
+	"os"
 	"time"
 )
 
 var conn *sql.DB
 
 func Connect() {
-	connect, err := sql.Open("clickhouse", "tcp://192.168.1.106:9000?debug=true")
+	var err error
+	ip := os.Getenv("LOCAL_IP")
+	conn, err = sql.Open("clickhouse", "tcp://"+ip+":9000?debug=true")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("-------------------")
-	if err := connect.Ping(); err != nil {
+	if err := conn.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
@@ -26,7 +29,7 @@ func Connect() {
 	}
 	fmt.Println("-------------------")
 
-	_, err = connect.Exec(`
+	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS journal (
 			PRESSURE   Float64,
 			HUMIDITY Float64,
