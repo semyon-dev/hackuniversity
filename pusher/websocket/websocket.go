@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"flag"
+	"github.com/semyon-dev/hackuniversity/pusher/db"
 	"github.com/semyon-dev/hackuniversity/pusher/generate"
 	"log"
 	"net/url"
@@ -52,7 +53,10 @@ func Run() {
 		case <-done:
 			return
 		case t := <-ticker.C:
-			err := c.WriteMessage(websocket.TextMessage, generate.NewData())
+			dataJson, data := generate.NewData()
+			// отправялемь данные сразу и в бд и в вебсокет
+			go db.Save(data)
+			err := c.WriteMessage(websocket.TextMessage, dataJson)
 			_ = t
 			//fmt.Println(t.String())
 			if err != nil {
