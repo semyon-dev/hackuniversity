@@ -112,6 +112,11 @@ func checkCriticalParameters(jsonData []byte) {
 	}
 }
 
+
+
+
+
+
 func main() {
 	fmt.Println(os.Getenv("LOCAL_IP"))
 	db.Connect()
