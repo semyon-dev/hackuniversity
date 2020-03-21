@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/semyon-dev/hackuniversity/api/model"
 	"log"
 	"strconv"
 	"strings"
@@ -36,7 +37,7 @@ func main() {
 
 	r.POST("/critical", func(context *gin.Context) {
 
-		var critical Criticals
+		var critical model.Criticals
 		err := context.ShouldBindJSON(&critical)
 		if err != nil {
 			fmt.Println(err)
@@ -58,9 +59,9 @@ func main() {
 	// return average value between start date and time and end date and time
 	r.GET("/period", func(context *gin.Context) {
 
-		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
+		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 
-		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		params := averageValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
@@ -70,8 +71,8 @@ func main() {
 	})
 
 	r.GET("/max", func(context *gin.Context) {
-		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
-		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		params := maxValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
@@ -98,7 +99,7 @@ func main() {
 	}
 }
 
-func nameDateTimes(context *gin.Context) (string,string,string) {
+func nameDateTimes(context *gin.Context) (string, string, string) {
 
 	name := context.Query("paramName")
 	dateStart := context.Query("dateStart")
@@ -106,12 +107,10 @@ func nameDateTimes(context *gin.Context) (string,string,string) {
 	timeStart := context.Query("timeStart")
 	timeEnd := context.Query("timeEnd")
 
-	dateTimeStart:=dateStart+" "+timeStart
-	dateTimeEnd:=dateEnd+" "+timeEnd
-	return name,dateTimeStart,dateTimeEnd
+	dateTimeStart := dateStart + " " + timeStart
+	dateTimeEnd := dateEnd + " " + timeEnd
+	return name, dateTimeStart, dateTimeEnd
 }
-
-
 
 var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
@@ -155,7 +154,7 @@ func connect() {
 	var err error
 	conn, err = sql.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	_, err = conn.Exec(`
@@ -169,7 +168,7 @@ func connect() {
 
 	//engine=Memory
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	listNames := []string{
@@ -203,43 +202,45 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-
-
 func averageValue(paramName, dateStart, dateEnd string) []float32 {
-		execStr:="SELECT avg("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 
-		fmt.Println(execStr + " - !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		rows, err := clicconn.Query(execStr)
-		if err != nil {
-			panic(err)
-		}
+	fmt.Println(execStr + " - !!!!")
+	rows, err := clicconn.Query(execStr)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		var val float32
-		var allParams []float32
-		for rows.Next() {
-			rows.Scan(&val)
-			allParams = append(allParams, val)
-		}
-		return allParams
+	var val float32
+	var allParams []float32
+	for rows.Next() {
+		rows.Scan(&val)
+		allParams = append(allParams, val)
+	}
+	return allParams
 }
 
 func maxValue(paramName, dateStart, dateEnd string) float32 {
-	execStr:="SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 	rows, err := clicconn.Query(execStr)
+
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	var val float32
 	for rows.Next() {
-		rows.Scan(&val)
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return val
 }
 
 func minValue(paramName, dateStart, dateEnd string) float32 {
-	execStr:="SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 	rows, err := clicconn.Query(execStr)
 	if err != nil {
 		panic(err)
@@ -253,12 +254,7 @@ func minValue(paramName, dateStart, dateEnd string) float32 {
 	return val
 }
 
-
-
-
-
-
-func newDate(date string) Date {
+func newDate(date string) model.Date {
 	vals := strings.Split(date, ".")
 
 	day, err := strconv.Atoi(vals[0])
@@ -273,16 +269,12 @@ func newDate(date string) Date {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return Date{day: day, month: month, year: year}
+	return model.Date{Day: day, Month: month, Year: year}
 }
 
-type Date struct {
-	day, month, year int
-}
-
-func daysBetween(dateStart, dateEnd Date) {
-	date1 := time.Date(dateStart.year, time.Month(dateStart.month), dateStart.day, 0, 0, 0, 0, time.UTC)
-	date2 := time.Date(dateEnd.year, time.Month(dateEnd.month), dateEnd.day, 0, 0, 0, 0, time.UTC)
+func daysBetween(dateStart, dateEnd model.Date) {
+	date1 := time.Date(dateStart.Year, time.Month(dateStart.Month), dateStart.Day, 0, 0, 0, 0, time.UTC)
+	date2 := time.Date(dateEnd.Year, time.Month(dateEnd.Month), dateEnd.Day, 0, 0, 0, 0, time.UTC)
 	days := int(date2.Sub(date1))
 	fmt.Println(days)
 }
@@ -294,32 +286,23 @@ func insertMinMax(name string, min float64, max float64) {
 	}
 }
 
-type Criticals struct {
-	Name string  `json:"param"`
-	Min  float64 `json:"min"`
-	Max  float64 `json:"max"`
-}
-
 func updateCritical(name string, min, max float64) error {
-
-	fmt.Println(name)
 
 	_, err := conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
 	return err
 }
 
-func getCriticals() []Criticals {
+func getCriticals() []model.Criticals {
 	rows, err := conn.Query("SELECT paramname,minimum,maximum FROM criticals")
 	if err != nil {
 		fmt.Println(err)
 	}
-	var criticals []Criticals
+	var criticals []model.Criticals
 	var name string
 	var min, max float64
 	for rows.Next() {
 		rows.Scan(&name, &min, &max)
-		criticals = append(criticals, Criticals{Name: name, Min: min, Max: max})
-
+		criticals = append(criticals, model.Criticals{Name: name, Min: min, Max: max})
 	}
 
 	return criticals
