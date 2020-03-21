@@ -102,8 +102,8 @@ func SaveAll(data map[string]float32) {
 	stmt.Exec(
 		data["PRESSURE"],
 		data["HUMIDITY"],
-		data["TEMP_HOME"],
-		data["TEMP_WORK"],
+		data["TEMPHOME"],
+		data["TEMPWORK"],
 		data["LEVELS"],
 		data["MASS"],
 		data["WATER"],
