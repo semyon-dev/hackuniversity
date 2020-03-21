@@ -3,15 +3,11 @@
 package main
 
 import (
+	"github.com/semyon-dev/hackuniversity/pusher/db"
 	"github.com/semyon-dev/hackuniversity/pusher/websocket"
 )
 
 func main() {
+	db.Connect()
 	websocket.Run()
-	//for {
-	//	//Publish a message
-	//	body := generate()
-	//	fmt.Println("Message:", string(body))
-	//	time.Sleep(1 * time.Second)
-	//}
 }
