@@ -6,6 +6,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
+	"os"
 	"time"
 )
 
@@ -13,7 +14,10 @@ var conn *sql.DB
 
 func Connect() {
 	var err error
-	ip := "192.168.1.109"
+	ip := os.Getenv("LOCAL_IP")
+	if len(ip) == 0 {
+		ip = "192.168.1.109"
+	}
 	conn, err = sql.Open("clickhouse", "tcp://"+ip+":8123?debug=true")
 	if err != nil {
 		log.Fatal(err)

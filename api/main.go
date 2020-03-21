@@ -8,9 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"log"
-	"strconv"
-	"strings"
-	"time"
 )
 
 var conn *sql.DB
@@ -51,6 +48,17 @@ func main() {
 				"status": "OK",
 			})
 		}
+	})
+
+	r.GET("/period", func(context *gin.Context) {
+		name := context.Query("paramName")
+		dateStart := context.Query("dateStart")
+		dateEnd := context.Query("dateEnd")
+		params := getParamForPeriod(name, dateStart, dateEnd)
+		context.JSON(200,
+			gin.H{
+				"parameters": params,
+			})
 	})
 
 	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
@@ -144,91 +152,4 @@ func connect() {
 	}
 
 	fmt.Println("connected successfully....")
-}
-
-func getParamForPeriod(paramName, dateStart, dateEnd string) []float32 {
-	if dateEnd == "now" {
-		rows, err := clicconn.Query("SELECT $1 FROM journal WHERE action_time > $2", paramName, dateStart)
-		if err != nil {
-			panic(err)
-		}
-
-		var val float32
-		var allParams []float32
-		for rows.Next() {
-			rows.Scan(&val)
-			allParams = append(allParams, val)
-		}
-		return allParams
-	} else {
-
-		return []float32{1, 2, 3}
-	}
-}
-
-func newDate(date string) Date {
-	vals := strings.Split(date, ".")
-
-	day, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	month, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	year, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	return Date{day: day, month: month, year: year}
-}
-
-type Date struct {
-	day, month, year int
-}
-
-func daysBetween(dateStart, dateEnd Date) {
-	date1 := time.Date(dateStart.year, time.Month(dateStart.month), dateStart.day, 0, 0, 0, 0, time.UTC)
-	date2 := time.Date(dateEnd.year, time.Month(dateEnd.month), dateEnd.day, 0, 0, 0, 0, time.UTC)
-	days := int(date2.Sub(date1))
-	fmt.Println(days)
-}
-
-func insertMinMax(name string, min float64, max float64) {
-	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-type Criticals struct {
-	Name string  `json:"param"`
-	Min  float64 `json:"min"`
-	Max  float64 `json:"max"`
-}
-
-func updateCritical(name string, min, max float64) error {
-
-	fmt.Println(name)
-
-	_, err := conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
-	return err
-}
-
-func getCriticals() []Criticals {
-	rows, err := conn.Query("SELECT paramname,minimum,maximum FROM criticals")
-	if err != nil {
-		fmt.Println(err)
-	}
-	var criticals []Criticals
-	var name string
-	var min, max float64
-	for rows.Next() {
-		rows.Scan(&name, &min, &max)
-		criticals = append(criticals, Criticals{Name: name, Min: min, Max: max})
-
-	}
-
-	return criticals
 }

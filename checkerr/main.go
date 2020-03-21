@@ -57,6 +57,7 @@ func checkCriticalParameters(jsonData []byte) {
 }
 
 func main() {
+	fmt.Println(os.Getenv("LOCAL_IP")+" -is locip")
 	db.Connect()
 	Logging()
 	flag.Parse()
