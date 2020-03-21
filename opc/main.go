@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
 	"github.com/gopcua/opcua"
 	"github.com/gopcua/opcua/debug"
+	"github.com/gopcua/opcua/ua"
 	"log"
 )
 
@@ -18,11 +19,43 @@ func main() {
 
 	//ctx := context.Background()
 
-	endpoints, err := opcua.GetEndpoints(*endpoint)
-	if err != nil {
+	var (
+		nodeID   = flag.String("node", "", "NodeID to read")
+	)
+	flag.Parse()
+	log.SetFlags(0)
+
+	ctx := context.Background()
+
+	c := opcua.NewClient(*endpoint, opcua.SecurityMode(ua.MessageSecurityModeNone))
+	if err := c.Connect(ctx); err != nil {
 		log.Fatal(err)
 	}
-	for i := 0; i < len(endpoints); i++ {
-		fmt.Printf("%s \n", endpoints[i].EndpointURL)
+	defer c.Close()
+
+	id, err := ua.ParseNodeID(*nodeID)
+	if err != nil {
+		log.Fatalf("invalid node id: %v", err)
 	}
+
+	req := &ua.ReadRequest{
+		MaxAge: 2000,
+		NodesToRead: []*ua.ReadValueID{
+			&ua.ReadValueID{NodeID: id},
+		},
+		TimestampsToReturn: ua.TimestampsToReturnBoth,
+	}
+
+	resp, err := c.Read(req)
+	if err != nil {
+		log.Fatalf("Read failed: %s", err)
+	}
+	if resp.Results[0].Status != ua.StatusOK {
+		log.Fatalf("Status not OK: %v", resp.Results[0].Status)
+	}
+	log.Printf("%#v", resp.Results[0].Value.Value())
+
+
+
+
 }

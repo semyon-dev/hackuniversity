@@ -140,7 +140,5 @@ func getCriticals() []Criticals {
 
 	}
 
-	fmt.Println(criticals[0].Name + " selected")
-
 	return criticals
 }
