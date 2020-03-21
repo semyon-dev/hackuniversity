@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/gopcua/opcua"
 	"github.com/gopcua/opcua/ua"
+	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
 )
 
-func GetData() {
-
+func GetData() ([]byte, model.Data) {
 	nodeIDs := []string{"ns=1;s=humidity", "ns=1;s=pressure", "ns=1;s=temphome", "ns=1;s=tempwork",
 		"ns=1;s=levelph", "ns=1;s=levelco2", "ns=1;s=mass", "ns=1;s=water"}
 

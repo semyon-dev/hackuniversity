@@ -1,6 +1,14 @@
 # hackuniversity 2020
 team's name: Time walkers
 
+## Technology stack
+Go v1.14
+Clickhouse
+PostgresSQL
+OPC UA Simulator
+Gin
+gorilla websockets
+
 # Микросервисы
 ## pusher
 `go run pusher/main.go` \
