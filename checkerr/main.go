@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/semyon-dev/hackuniversity/checkerr/db"
 	. "github.com/semyon-dev/hackuniversity/checkerr/log"
+	"github.com/semyon-dev/hackuniversity/checkerr/model"
 	"log"
 	"net/http"
 	"os"
@@ -37,7 +38,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkCriticalParameters(jsonData []byte) {
-	var data map[string]float64
+	var data model.Data
 	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		fmt.Println(err)
