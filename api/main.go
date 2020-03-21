@@ -3,12 +3,15 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/ClickHouse/clickhouse-go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 var conn *sql.DB
+var clicconn *sql.DB
 
 func main() {
 	r := gin.Default()
@@ -52,6 +55,51 @@ func main() {
 
 var connStr = "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
 
+
+func clickConnect() {
+	var err error
+	clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.106:9000?debug=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("-------------------")
+	if err := clicconn.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+		} else {
+			fmt.Println("err", err)
+		}
+	}
+	fmt.Println("-------------------")
+
+	_, err = clicconn.Exec(`
+		CREATE TABLE IF NOT EXISTS journal (
+			PRESSURE   Float64,
+			HUMIDITY Float64,
+			TEMPHOME Float64,
+			TEMPWORK Float64,
+			LEVELPH Float64,
+			MASS Float64,
+			WATER Float64,
+			LEVELCO2 Float64,
+			action_day   Date,
+			action_time  DateTime
+		) engine=Memory
+	`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+
+
+
+
+
+
+
 func connect() {
 	var err error
 	conn, err = sql.Open("postgres", connStr)
@@ -59,7 +107,7 @@ func connect() {
 		panic(err)
 	}
 
-	res, err := conn.Exec(`
+	_, err = conn.Exec(`
 		CREATE TABLE IF NOT EXISTS  criticals (
 			id serial primary key, 
 			paramname varchar(20),
@@ -85,11 +133,11 @@ func connect() {
 	}
 
 	var haveDefaults = false
-	rows, _ := conn.Query("SELECT id FROM criticals LIMIT 1")
+	rows, _ := conn.Query("SELECT id FROM criticals LIMIT 20")
 	var id int
 	for rows.Next() {
 		rows.Scan(&id)
-		if id == 1 {
+		if id != 1 {
 			haveDefaults = true
 		}
 	}
@@ -102,8 +150,21 @@ func connect() {
 	}
 
 	fmt.Println("connected successfully....")
-	fmt.Println(res)
 }
+
+
+func getParamForPeriod(dateStart,dateEnd string){
+	if dateEnd=="now"{
+		clicconn.Exec("SELECT ")
+	}
+
+}
+
+
+
+
+
+
 
 func insertMinMax(name string, min float64, max float64) {
 	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)

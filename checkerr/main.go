@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/semyon-dev/hackuniversity/checkerr/DB"
+	"github.com/semyon-dev/hackuniversity/checkerr/db"
 	. "github.com/semyon-dev/hackuniversity/checkerr/log"
 	"log"
 	"net/http"
@@ -39,16 +39,6 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("recv: %s", message)
 		checkCriticalParameters(message)
-
-		//for _, Connection := range Connections {
-		//	if Connection != c {
-		//		err = Connection.WriteMessage(mt, message)
-		//		if err != nil {
-		//			log.Println("write:", err)
-		//			break
-		//		}
-		//	}
-		//}
 	}
 }
 
@@ -59,12 +49,12 @@ func checkCriticalParameters(jsonData []byte) {
 		fmt.Println(err)
 	}
 
-	criticals := DB.GetCriticals()
+	criticals := db.GetCriticals()
 
 	for key, val := range data {
 		if (val < criticals[key]["min"]) && (val > criticals[key]["max"]) {
 			Log.Error(key + " - over normal value")
-			err := DB.InsertError(key, "over normal value", val)
+			err := db.InsertError(key, "over normal value", val)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -73,7 +63,7 @@ func checkCriticalParameters(jsonData []byte) {
 }
 
 func main() {
-	DB.Connect()
+	db.Connect()
 
 	Logging()
 	flag.Parse()

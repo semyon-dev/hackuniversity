@@ -1,4 +1,4 @@
-package DB
+package db
 
 import (
 	"database/sql"
@@ -12,7 +12,7 @@ func Connect() {
 	var err error
 
 	// language=SQL
-	connStr := "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
+	connStr := "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 	conn, err = sql.Open("postgres", connStr)
 	if err != nil {
