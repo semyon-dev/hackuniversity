@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	_"github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 var conn *sql.DB
@@ -15,15 +15,34 @@ func main() {
 	connect()
 
 	r.GET("/criticals", func(context *gin.Context) {
-		context.JSON(200,getCriticals())
+
+		criticals := make(map[string]map[string]float64)
+
+		for _, i := range getCriticals() {
+			criticals[i.Name] = map[string]float64{"min": i.Min, "max": i.Max}
+		}
+
+		context.JSON(200, criticals)
 	})
 
+	r.POST("/critical", func(context *gin.Context) {
 
+		var critical Criticals
+		context.BindJSON(&critical)
+		err := updateCritical(critical.Name, critical.Min, critical.Max)
+		if err != nil {
+			context.JSON(500, gin.H{
+				"status": "ERROR",
+			})
+		} else {
+			context.JSON(200, gin.H{
+				"status": "OK",
+			})
+		}
+	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
-
-
 
 var connStr = "host=localhost port=5432 user=postgres dbname=postgres password=12345678 sslmode=disable"
 
@@ -59,13 +78,12 @@ func connect() {
 		"LEVELCO2",
 	}
 
-
 	var haveDefaults = false
-	rows,_:=conn.Query("SELECT id FROM criticals LIMIT 1")
+	rows, _ := conn.Query("SELECT id FROM criticals LIMIT 1")
 	var id int
-	for rows.Next(){
+	for rows.Next() {
 		rows.Scan(&id)
-		if id ==1{
+		if id == 1 {
 			haveDefaults = true
 		}
 	}
@@ -76,7 +94,6 @@ func connect() {
 			conn.Exec(createDefaults, i)
 		}
 	}
-
 
 	fmt.Println("connected successfully....")
 	fmt.Println(res)
@@ -89,25 +106,32 @@ func insertMinMax(name string, min float64, max float64) {
 	}
 }
 
-type minMaxCriticals struct {
-	name string `json:"name"`
-	min float64 `json:"min"`
-	max float64 `json:"max"`
+type Criticals struct {
+	Name string  `json:"name"`
+	Min  float64 `json:"min"`
+	Max  float64 `json:"max"`
 }
 
+func updateCritical(name string, min, max float64) error {
+	_, err := conn.Exec("UPDATE criticals SET paramname = $1,minimum = $2,maximum = $3")
+	return err
+}
 
-func getCriticals()[]minMaxCriticals{
-	rows,err:=conn.Query("SELECT paramname,minimum,maximum FROM criticals")
-	if err!=nil{
+func getCriticals() []Criticals {
+	rows, err := conn.Query("SELECT paramname,minimum,maximum FROM criticals")
+	if err != nil {
 		fmt.Println(err)
 	}
-	var criticals []minMaxCriticals
+	var criticals []Criticals
 	var name string
-	var min,max float64
-	for rows.Next(){
-		rows.Scan(&name,&min,&max)
-		criticals = append(criticals,minMaxCriticals{name:name,min:min,max:max})
+	var min, max float64
+	for rows.Next() {
+		rows.Scan(&name, &min, &max)
+		criticals = append(criticals, Criticals{Name: name, Min: min, Max: max})
+
 	}
+
+	fmt.Println(criticals[0].Name + " selected")
 
 	return criticals
 }
