@@ -21,6 +21,7 @@ func main() {
 	r.Use(cors.Default())
 
 	connect()
+	clickConnect()
 
 	r.GET("/criticals", func(context *gin.Context) {
 
@@ -57,7 +58,15 @@ func main() {
 		name := context.Query("paramName")
 		dateStart := context.Query("dateStart")
 		dateEnd := context.Query("dateEnd")
-		params := getParamForPeriod(name, dateStart, dateEnd)
+		timeStart := context.Query("timeStart")
+		timeEnd := context.Query("timeEnd")
+
+		dateTimeStart:=dateStart+" "+timeStart
+		dateTimeEnd:=dateEnd+" "+timeEnd
+
+		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+
+		params := averageValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
 			gin.H{
 				"parameters": params,
@@ -66,6 +75,10 @@ func main() {
 
 	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
+
+
+
+
 
 var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
@@ -159,9 +172,11 @@ func connect() {
 
 
 
-func getParamForPeriod(paramName, dateStart, dateEnd string) []float32 {
-	if dateEnd == "now" {
-		rows, err := clicconn.Query("SELECT $1 FROM journal WHERE action_time > $2", paramName, dateStart)
+func averageValue(paramName, dateStart, dateEnd string) []float32 {
+		execStr:="SELECT avg("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+
+		fmt.Println(execStr + " - !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		rows, err := clicconn.Query(execStr)
 		if err != nil {
 			panic(err)
 		}
@@ -173,11 +188,40 @@ func getParamForPeriod(paramName, dateStart, dateEnd string) []float32 {
 			allParams = append(allParams, val)
 		}
 		return allParams
-	} else {
-
-		return []float32{1, 2, 3}
-	}
 }
+
+func maxValue(paramName, dateStart, dateEnd string) float32 {
+	rows, err := clicconn.Query("SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	if err != nil {
+		panic(err)
+	}
+
+	var val float32
+	for rows.Next() {
+		rows.Scan(&val)
+	}
+
+	return val
+}
+
+func minValue(paramName, dateStart, dateEnd string) float32 {
+	rows, err := clicconn.Query("SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	if err != nil {
+		panic(err)
+	}
+
+	var val float32
+	for rows.Next() {
+		rows.Scan(&val)
+	}
+
+	return val
+}
+
+
+
+
+
 
 func newDate(date string) Date {
 	vals := strings.Split(date, ".")
