@@ -57,10 +57,8 @@ func main() {
 
 	// test url: /period?paramName=HUMIDITY&dateStart=2020-03-20&dateEnd=2020-03-30&timeStart=00:00:00&timeEnd=00:00:00
 	// return average value between start date and time and end date and time
-	r.GET("/period", func(context *gin.Context) {
-
+	r.GET("/average", func(context *gin.Context) {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
-
 		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		params := averageValue(name, dateTimeStart, dateTimeEnd)
@@ -92,6 +90,24 @@ func main() {
 				"parameters": params,
 			})
 	})
+
+	r.GET("/maindata", func(context *gin.Context) {
+		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+
+		min := minValue(name, dateTimeStart, dateTimeEnd)
+		max := maxValue(name, dateTimeStart, dateTimeEnd)
+		avg := averageValue(name, dateTimeStart, dateTimeEnd)
+
+		context.JSON(200,
+			gin.H{
+				"min": min,
+				"avg": avg,
+				"max": max,
+			})
+	})
+
+
 
 	err := r.Run(":5000")
 	if err != nil {
