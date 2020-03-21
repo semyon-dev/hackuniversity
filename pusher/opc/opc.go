@@ -21,7 +21,7 @@ func GetData() ([]byte, model.Data) {
 
 	c = opcua.NewClient("opc.tcp://semyonpc:4334/", opcua.SecurityMode(ua.MessageSecurityModeNone))
 	if err := c.Connect(ctx); err != nil {
-		log.Fatal(err)
+		log.Println("не получилось получить данные из opc ua sever:", err)
 	}
 	defer c.Close()
 
@@ -38,7 +38,7 @@ func GetData() ([]byte, model.Data) {
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 	}
 	return jsonData, data
 }

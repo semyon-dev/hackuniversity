@@ -67,11 +67,13 @@ func checkValues(name string, dict map[string]map[string]float64, value float64)
 }
 
 func main() {
-	fmt.Println(os.Getenv("LOCAL_IP"))
 	db.Connect()
 	Logging()
 	flag.Parse()
 	log.SetFlags(0)
 	http.HandleFunc("/", echo)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		fmt.Println("произошла ошибка при запуске вебсокетов:", err)
+	}
 }
