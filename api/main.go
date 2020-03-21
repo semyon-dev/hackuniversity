@@ -99,8 +99,6 @@ func connect() {
 	}
 
 	_, err = conn.Exec(`
-		CREATE TABLE IF NOT EXISTS  criticals (
-	res, err := conn.Exec(
 		CREATE TABLE IF NOT EXISTS criticals (
 			id serial primary key, 
 			paramname varchar(20),
@@ -145,12 +143,31 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-func getParamForPeriod(dateStart, dateEnd string) {
+func getParamForPeriod(paramName,dateStart, dateEnd string) {
 	if dateEnd == "now" {
-		clicconn.Exec("SELECT ")
-	}
+		rows,err:=clicconn.Query("SELECT $1 FROM journal WHERE action_time > $2",paramName,dateStart)
+		if err!=nil{
+			panic(err)
+		}
 
+		var val float32
+		var allParams []float32
+		for rows.Next(){
+			rows.Scan(&val)
+			allParams = append(allParams,val)
+		}
+
+	}
 }
+
+//func averageData()
+
+
+
+
+
+
+
 
 func insertMinMax(name string, min float64, max float64) {
 	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)

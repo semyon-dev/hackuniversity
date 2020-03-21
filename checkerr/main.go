@@ -58,10 +58,6 @@ func checkCriticalParameters(jsonData []byte) {
 
 func main() {
 	db.Connect()
-<<<<<<< HEAD
-
-=======
->>>>>>> b60bf299463c665b3fe036eeacda51a3b9d54fd2
 	Logging()
 	flag.Parse()
 	log.SetFlags(0)
