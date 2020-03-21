@@ -46,7 +46,7 @@ func checkCriticalParameters(jsonData []byte) {
 	criticals := db.GetCriticals()
 
 	for key, val := range data {
-		if (val < criticals[key]["min"]) && (val > criticals[key]["max"]) {
+		if (val < criticals[key]["min"]) || (val > criticals[key]["max"]) {
 			Log.Error(key + " - over normal value")
 			err := db.InsertError(key, "over normal value", val)
 			if err != nil {
@@ -57,7 +57,7 @@ func checkCriticalParameters(jsonData []byte) {
 }
 
 func main() {
-	fmt.Println(os.Getenv("LOCAL_IP")+" -is locip")
+	fmt.Println(os.Getenv("LOCAL_IP"))
 	db.Connect()
 	Logging()
 	flag.Parse()
