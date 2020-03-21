@@ -64,7 +64,7 @@ func main() {
 			})
 	})
 
-	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(":5000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
 var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
@@ -156,8 +156,6 @@ func connect() {
 
 	fmt.Println("connected successfully....")
 }
-
-
 
 func getParamForPeriod(paramName, dateStart, dateEnd string) []float32 {
 	if dateEnd == "now" {
