@@ -16,13 +16,14 @@ import (
 
 var conn *sql.DB
 var clicconn *sql.DB
+var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	connect()
-	clickConnect()
+	connectPostgres()
+	connectClickhouse()
 
 	r.GET("/criticals", func(context *gin.Context) {
 
@@ -41,6 +42,10 @@ func main() {
 		err := context.ShouldBindJSON(&critical)
 		if err != nil {
 			fmt.Println(err)
+			context.JSON(400, gin.H{
+				"status":  "ERROR",
+				"message": err,
+			})
 		}
 		err = updateCritical(critical.Name, critical.Min, critical.Max)
 		if err != nil {
@@ -92,7 +97,7 @@ func main() {
 
 	r.GET("/maindata", func(context *gin.Context) {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
-		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
+		// fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		min := minValue(name, dateTimeStart, dateTimeEnd)
 		max := maxValue(name, dateTimeStart, dateTimeEnd)
@@ -106,6 +111,7 @@ func main() {
 			})
 	})
 
+	fmt.Println("запуск API на 5000 порту...")
 	err := r.Run(":5000")
 	if err != nil {
 		fmt.Println("ошибка при запуске API", err)
@@ -114,7 +120,6 @@ func main() {
 
 // получение границ даты и времени из юрл
 func nameDateTimes(context *gin.Context) (string, string, string) {
-
 	currentTime := time.Now().String()
 	strCurrTime := strings.Split(currentTime, ".")[0]
 	name := context.Query("paramName")
@@ -135,9 +140,7 @@ func nameDateTimes(context *gin.Context) (string, string, string) {
 	return name, dateTimeStart, dateTimeEnd
 }
 
-var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
-
-func clickConnect() {
+func connectClickhouse() {
 	var err error
 	clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.109:9000?debug=true")
 	if err != nil {
@@ -173,7 +176,7 @@ func clickConnect() {
 	}
 }
 
-func connect() {
+func connectPostgres() {
 	var err error
 	conn, err = sql.Open("postgres", connStr)
 	if err != nil {
