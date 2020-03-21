@@ -54,15 +54,11 @@ func main() {
 		}
 	})
 
+	// test url: /period?paramName=HUMIDITY&dateStart=2020-03-20&dateEnd=2020-03-30&timeStart=00:00:00&timeEnd=00:00:00
+	// return average value between start date and time and end date and time
 	r.GET("/period", func(context *gin.Context) {
-		name := context.Query("paramName")
-		dateStart := context.Query("dateStart")
-		dateEnd := context.Query("dateEnd")
-		timeStart := context.Query("timeStart")
-		timeEnd := context.Query("timeEnd")
 
-		dateTimeStart:=dateStart+" "+timeStart
-		dateTimeEnd:=dateEnd+" "+timeEnd
+		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
 
 		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
 
@@ -73,13 +69,33 @@ func main() {
 			})
 	})
 
+	r.GET("/max", func(context *gin.Context) {
+		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+
+		//params := minValue()
+
+
+	})
+
 	err := r.Run(":5000")
 	if err != nil {
 		fmt.Println("ошибка при запуске API", err)
 	}
 }
 
+func nameDateTimes(context *gin.Context) (string,string,string) {
 
+	name := context.Query("paramName")
+	dateStart := context.Query("dateStart")
+	dateEnd := context.Query("dateEnd")
+	timeStart := context.Query("timeStart")
+	timeEnd := context.Query("timeEnd")
+
+	dateTimeStart:=dateStart+" "+timeStart
+	dateTimeEnd:=dateEnd+" "+timeEnd
+	return name,dateTimeStart,dateTimeEnd
+}
 
 
 
@@ -194,7 +210,8 @@ func averageValue(paramName, dateStart, dateEnd string) []float32 {
 }
 
 func maxValue(paramName, dateStart, dateEnd string) float32 {
-	rows, err := clicconn.Query("SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	execStr:="SELECT MAX("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	rows, err := clicconn.Query(execStr)
 	if err != nil {
 		panic(err)
 	}
@@ -208,7 +225,8 @@ func maxValue(paramName, dateStart, dateEnd string) float32 {
 }
 
 func minValue(paramName, dateStart, dateEnd string) float32 {
-	rows, err := clicconn.Query("SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN ? AND ? ", dateStart,dateEnd)
+	execStr:="SELECT MIN("+paramName+") FROM journal WHERE action_time BETWEEN toDateTime('"+dateStart+"', 'Europe/Moscow')  AND toDateTime('"+dateEnd+"', 'Europe/Moscow')"
+	rows, err := clicconn.Query(execStr)
 	if err != nil {
 		panic(err)
 	}
