@@ -143,7 +143,7 @@ func connect() {
 	fmt.Println("connected successfully....")
 }
 
-func getParamForPeriod(paramName,dateStart, dateEnd string) {
+func getParamForPeriod(paramName,dateStart, dateEnd string)[]float32 {
 	if dateEnd == "now" {
 		rows,err:=clicconn.Query("SELECT $1 FROM journal WHERE action_time > $2",paramName,dateStart)
 		if err!=nil{
@@ -156,11 +156,16 @@ func getParamForPeriod(paramName,dateStart, dateEnd string) {
 			rows.Scan(&val)
 			allParams = append(allParams,val)
 		}
+		return allParams
+	}else{
 
+		return []float32{1,2,3}
 	}
 }
 
-//func averageData()
+func averageData(secondsAverage int,){
+
+}
 
 
 
