@@ -19,7 +19,7 @@ func GetData() ([]byte, model.Data) {
 
 	ctx := context.Background()
 
-	c = opcua.NewClient("opc.tcp://185.251.90.101:4334", opcua.SecurityMode(ua.MessageSecurityModeNone))
+	c = opcua.NewClient("opc.tcp://semyonpc:4334/", opcua.SecurityMode(ua.MessageSecurityModeNone))
 	if err := c.Connect(ctx); err != nil {
 		log.Fatal(err)
 	}
