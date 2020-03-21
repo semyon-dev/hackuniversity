@@ -30,5 +30,8 @@ API отвечает за изменение min и max параметров (к
 `node opc.js` \
 opc - симулятор opc ua server
 
+## Scheme
+![](https://github.com/semyon-dev/hackuniversity/blob/master/scheme.png) 
+
 ## LICENSE
 MIT
