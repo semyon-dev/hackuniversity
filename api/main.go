@@ -8,6 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"log"
+	"strconv"
+	"strings"
+	"time"
 )
 
 var conn *sql.DB
@@ -163,8 +166,34 @@ func getParamForPeriod(paramName,dateStart, dateEnd string)[]float32 {
 	}
 }
 
-func averageData(secondsAverage int,){
+func newDate(date string)Date{
+	vals:=strings.Split(date,".")
 
+	day,err:=strconv.Atoi( vals[0])
+	if err!=nil{
+		fmt.Println(err)
+	}
+	month,err:=strconv.Atoi( vals[0])
+	if err!=nil{
+		fmt.Println(err)
+	}
+	year,err:=strconv.Atoi( vals[0])
+	if err!=nil{
+		fmt.Println(err)
+	}
+	return Date{day: day,month:month,year:year}
+}
+
+
+type Date struct{
+	day,month,year int
+}
+
+func daysBetween(dateStart,dateEnd Date){
+	date1:=time.Date(dateStart.year,time.Month(dateStart.month),dateStart.day,0,0,0,0,time.UTC)
+	date2:=time.Date(dateEnd.year,time.Month(dateEnd.month),dateEnd.day,0,0,0,0,time.UTC)
+	days:=int(date2.Sub(date1))
+	fmt.Println(days)
 }
 
 
