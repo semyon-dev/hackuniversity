@@ -38,8 +38,8 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // old not used version
+// deprecated:
 func checkCriticalParameters2(jsonData []byte) {
 	var data model.Data
 	err := json.Unmarshal(jsonData, &data)
@@ -123,20 +123,17 @@ func checkCriticalParameters(jsonData []byte) {
 
 	criticals := db.GetCriticals()
 
-	checkValues("TEMPWORK",criticals,data.TEMPWORK)
-	checkValues("TEMPHOME",criticals,data.TEMPHOME)
-	checkValues("WATER",criticals,data.WATER)
-	checkValues("PRESSURE",criticals,data.PRESSURE)
-	checkValues("MASS",criticals,data.MASS)
-	checkValues("LEVELPH",criticals,data.LEVELPH)
-	checkValues("LEVELCO2",criticals,data.LEVELCO2)
-	checkValues("HUMIDITY",criticals,data.HUMIDITY)
-
-
-
+	checkValues("TEMPWORK", criticals, data.TEMPWORK)
+	checkValues("TEMPHOME", criticals, data.TEMPHOME)
+	checkValues("WATER", criticals, data.WATER)
+	checkValues("PRESSURE", criticals, data.PRESSURE)
+	checkValues("MASS", criticals, data.MASS)
+	checkValues("LEVELPH", criticals, data.LEVELPH)
+	checkValues("LEVELCO2", criticals, data.LEVELCO2)
+	checkValues("HUMIDITY", criticals, data.HUMIDITY)
 }
 
-func checkValues(name string,dict map[string]map[string]float64,value float64){
+func checkValues(name string, dict map[string]map[string]float64, value float64) {
 	if (value < dict[name]["min"]) || (value > dict[name]["max"]) {
 		Log.Error(" - over normal value")
 		err := db.InsertError(name, "over normal value", value)
@@ -145,9 +142,6 @@ func checkValues(name string,dict map[string]map[string]float64,value float64){
 		}
 	}
 }
-
-
-
 
 func main() {
 	fmt.Println(os.Getenv("LOCAL_IP"))
