@@ -117,7 +117,6 @@ func nameDateTimes(context *gin.Context) (string, string, string) {
 
 	currentTime := time.Now().String()
 	strCurrTime := strings.Split(currentTime, ".")[0]
-
 	name := context.Query("paramName")
 	dateStart := context.Query("dateStart")
 	var dateTimeStart, dateTimeEnd string
@@ -189,7 +188,6 @@ func connect() {
 			minimum float 
 		)
 	`)
-
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -206,10 +204,16 @@ func connect() {
 	}
 
 	var haveDefaults = false
-	rows, _ := conn.Query("SELECT id FROM criticals LIMIT 20")
+	rows, err := conn.Query("SELECT id FROM criticals LIMIT 20")
+	if err != nil {
+		fmt.Println(err)
+	}
 	var id int
 	for rows.Next() {
-		rows.Scan(&id)
+		err = rows.Scan(&id)
+		if err != nil {
+			fmt.Println(err)
+		}
 		if id != 1 {
 			haveDefaults = true
 		}
@@ -218,7 +222,10 @@ func connect() {
 	if !haveDefaults {
 		for _, i := range listNames {
 			createDefaults := "INSERT INTO criticals(paramname,minimum,maximum) VALUES ($1,2,98)"
-			conn.Exec(createDefaults, i)
+			_, err = conn.Exec(createDefaults, i)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
 
@@ -227,7 +234,6 @@ func connect() {
 
 func averageValue(paramName, dateStart, dateEnd string) float32 {
 	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-
 	fmt.Println(execStr + " - !!!!")
 	rows, err := clicconn.Query(execStr)
 	if err != nil {
@@ -236,7 +242,10 @@ func averageValue(paramName, dateStart, dateEnd string) float32 {
 
 	var val float32
 	for rows.Next() {
-		rows.Scan(&val)
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	return val
 }
@@ -244,7 +253,6 @@ func averageValue(paramName, dateStart, dateEnd string) float32 {
 func maxValue(paramName, dateStart, dateEnd string) float32 {
 	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 	rows, err := clicconn.Query(execStr)
-
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -264,17 +272,21 @@ func minValue(paramName, dateStart, dateEnd string) float32 {
 	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
 	rows, err := clicconn.Query(execStr)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	var val float32
 	for rows.Next() {
-		rows.Scan(&val)
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return val
 }
 
+// unused:
 func newDate(date string) model.Date {
 	vals := strings.Split(date, ".")
 
@@ -293,6 +305,7 @@ func newDate(date string) model.Date {
 	return model.Date{Day: day, Month: month, Year: year}
 }
 
+// unused:
 func daysBetween(dateStart, dateEnd model.Date) {
 	date1 := time.Date(dateStart.Year, time.Month(dateStart.Month), dateStart.Day, 0, 0, 0, 0, time.UTC)
 	date2 := time.Date(dateEnd.Year, time.Month(dateEnd.Month), dateEnd.Day, 0, 0, 0, 0, time.UTC)
@@ -300,6 +313,7 @@ func daysBetween(dateStart, dateEnd model.Date) {
 	fmt.Println(days)
 }
 
+// unused:
 func insertMinMax(name string, min float64, max float64) {
 	_, err := conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
 	if err != nil {
@@ -308,7 +322,6 @@ func insertMinMax(name string, min float64, max float64) {
 }
 
 func updateCritical(name string, min, max float64) error {
-
 	_, err := conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
 	return err
 }
@@ -322,7 +335,10 @@ func getCriticals() []model.Criticals {
 	var name string
 	var min, max float64
 	for rows.Next() {
-		rows.Scan(&name, &min, &max)
+		err = rows.Scan(&name, &min, &max)
+		if err != nil {
+			fmt.Println(err)
+		}
 		criticals = append(criticals, model.Criticals{Name: name, Min: min, Max: max})
 	}
 

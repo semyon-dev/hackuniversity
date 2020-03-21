@@ -6,7 +6,6 @@ type Date struct {
 	Year  int
 }
 
-
 type Criticals struct {
 	Name string  `json:"param"`
 	Min  float64 `json:"min"`
