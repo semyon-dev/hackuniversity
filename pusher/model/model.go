@@ -1,12 +1,12 @@
 package model
 
 type Data struct {
-	PRESSURE float64 `json:"pressure"`
-	HUMIDITY float64 `json:"humidity"`
-	TEMPHOME float64 `json:"temphome"`
-	TEMPWORK float64 `json:"tempwork"`
-	LEVELPH  float64 `json:"level"`
-	MASS     float64 `json:"mass"`
-	WATER    float64 `json:"water"`
-	LEVELCO2 float64 `json:"levelco2"`
+	PRESSURE float64 `json:"PRESSURE"`
+	HUMIDITY float64 `json:"HUMIDITY"`
+	TEMPHOME float64 `json:"TEMPHOME"`
+	TEMPWORK float64 `json:"TEMPWORK"`
+	LEVELPH  float64 `json:"LEVELPH"`
+	MASS     float64 `json:"MASS"`
+	WATER    float64 `json:"WATER"`
+	LEVELCO2 float64 `json:"LEVELCO2"`
 }

@@ -14,6 +14,7 @@ import (
 )
 
 var addr = flag.String("addr", os.Getenv("LOCAL_IP")+":8080", "http service address")
+var addrDimaWS = flag.String("addrDimaWS", "192.168.1.109:8080", "http service address")
 
 func Run() {
 	flag.Parse()
@@ -25,28 +26,25 @@ func Run() {
 	u := url.URL{Scheme: "ws", Host: *addr, Path: "/"}
 	log.Printf("connecting to %s", u.String())
 
+	uDima := url.URL{Scheme: "ws", Host: *addrDimaWS, Path: "/"}
+	log.Printf("connecting to %s", u.String())
+
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Println("fatal error: dial:", err)
 	}
-	defer c.Close()
+	//defer c.Close()
+
+	cDima, _, err := websocket.DefaultDialer.Dial(uDima.String(), nil)
+	if err != nil {
+		log.Println("error: dial:", err)
+	}
+	//defer c.Close()
 
 	done := make(chan struct{})
 
-	//go func() {
-	//	defer close(done)
-	//	for {
-	//		_, message, err := c.ReadMessage()
-	//		if err != nil {
-	//			log.Println("read:", err)
-	//			return
-	//		}
-	//		log.Printf("recv: %s", message)
-	//	}
-	//}()
-
 	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
+	//defer ticker.Stop()
 
 	for {
 		select {
@@ -57,8 +55,13 @@ func Run() {
 			// отправялемь данные сразу и в бд и в вебсокет
 			db.Save(data)
 			err := c.WriteMessage(websocket.TextMessage, dataJson)
+			if err != nil {
+				log.Println("write:", err)
+				return
+			}
+			// отправляем вебскоеты на другой микросервис (Диме)
+			err = cDima.WriteMessage(websocket.TextMessage, dataJson)
 			_ = t
-			//fmt.Println(t.String())
 			if err != nil {
 				log.Println("write:", err)
 				return

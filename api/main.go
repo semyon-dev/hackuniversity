@@ -73,7 +73,10 @@ func main() {
 			})
 	})
 
-	r.Run(":5001") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	err := r.Run(":5000")
+	if err != nil {
+		fmt.Println("ошибка при запуске API", err)
+	}
 }
 
 
@@ -86,7 +89,7 @@ func clickConnect() {
 	var err error
 	clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.109:9000?debug=true")
 	if err != nil {
-		log.Fatal(err)
+		log.Println("ошибка при подключении к clickhouse", err)
 	}
 	fmt.Println("-------------------")
 	if err := clicconn.Ping(); err != nil {
@@ -114,7 +117,7 @@ func clickConnect() {
 	`)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("ошибка при создании таблицы journal", err)
 	}
 }
 

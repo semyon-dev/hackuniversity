@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go"
-	_ "github.com/ClickHouse/clickhouse-go"
 	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
 	"time"
@@ -18,7 +17,7 @@ func Connect() {
 	ip := "192.168.1.109"
 	conn, err = sql.Open("clickhouse", "tcp://"+ip+":9000?debug=true")
 	if err != nil {
-		log.Fatal(err)
+		log.Println("ошибка при подключении к clickhouse", err)
 	}
 	fmt.Println("-------------------")
 	if err := conn.Ping(); err != nil {
@@ -45,7 +44,7 @@ func Connect() {
 	`)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("ошибка при создании таблицы journal", err)
 	}
 }
 
@@ -68,9 +67,9 @@ func Save(data model.Data) {
 		time.Now(),
 		time.Now(),
 	); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	if err := tx.Commit(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
