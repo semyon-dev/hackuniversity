@@ -132,14 +132,12 @@ func checkCriticalParameters(jsonData []byte) {
 	checkValues("LEVELCO2",criticals,data.LEVELCO2)
 	checkValues("HUMIDITY",criticals,data.HUMIDITY)
 
-
-
 }
 
 func checkValues(name string,dict map[string]map[string]float64,value float64){
 	if (value < dict[name]["min"]) || (value > dict[name]["max"]) {
 		Log.Error(" - over normal value")
-		err := db.InsertError(name, "over normal value", value)
+		err := db.InsertError(name, name+" - over normal value", value)
 		if err != nil {
 			fmt.Println(err)
 		}
