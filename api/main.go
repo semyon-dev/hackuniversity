@@ -81,10 +81,9 @@ func main() {
 			})
 	})
 
-
 	r.GET("/min", func(context *gin.Context) {
-		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
-		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		params := minValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
