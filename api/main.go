@@ -91,8 +91,8 @@ func main() {
 	})
 
 	r.GET("/maindata", func(context *gin.Context) {
-		name,dateTimeStart,dateTimeEnd := nameDateTimes(context)
-		fmt.Println(name,dateTimeStart,dateTimeEnd, " values from query")
+		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
+		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		min := minValue(name, dateTimeStart, dateTimeEnd)
 		max := maxValue(name, dateTimeStart, dateTimeEnd)
@@ -105,8 +105,6 @@ func main() {
 				"max": max,
 			})
 	})
-
-
 
 	err := r.Run(":5000")
 	if err != nil {
