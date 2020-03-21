@@ -8,6 +8,7 @@ PostgresSQL
 OPC UA Simulator
 Gin
 Gorilla websockets
+JS OPC UA
 
 # Микросервисы
 ## pusher
@@ -25,7 +26,7 @@ checkerr получает данные с pusher (по websocket) и прове�
 API отвечает за изменение min и max параметров (критические параметры)
 
 ## opc
-`npm install` \
+`npm install node-opcua` \
 `node opc.js` \
 opc - симулятор opc ua server
 
