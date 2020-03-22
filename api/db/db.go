@@ -46,6 +46,19 @@ func ConnectClickhouse() {
 	if err != nil {
 		log.Println("ошибка при создании таблицы journal", err)
 	}
+
+	_, err = Clicconn.Exec(`
+		CREATE TABLE IF NOT EXISTS events (
+			PARAM  String,
+			AUTHOR String,
+			action_day   Date,
+			action_time  DateTime
+		) engine=Memory
+	`)
+
+	if err != nil {
+		log.Println("ошибка при создании таблицы events", err)
+	}
 }
 
 func ConnectPostgres() {

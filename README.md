@@ -1,11 +1,11 @@
 # hackuniversity 2020
-team's name: Time walkers
+team's name: time walkers
 
-## Technology stack
+## Используемые технологии
 * Go v1.14
 * Clickhouse
-* PostgresSQL
 * OPC UA Simulator
+* PostgresSQL
 * Gin
 * Gorilla websockets
 * JS OPC UA
@@ -23,19 +23,20 @@ checkerr получает данные с pusher (по websocket) и прове�
 
 ## api
 `go run api/main.go` \
-API отвечает за изменение min и max параметров (критические параметры)
+HTTP API отвечает за получение/изменение min и max параметров (критические параметры). \
+А также за аналитику данных
 
-## Unloader
+## unloader
 `go run unloader/main.go` \
-Этот микросервис отвечает за разгрузку данных на клиенты
+Этот микросервис отвечает за разгрузку данных на клиенты от микросервиса pusher
 
 ## opc
 `npm install node-opcua` \
 `node opc.js` \
-opc - симулятор opc ua server
+opc - симулятор opc ua server который генерирует данные типа float каждую секунду
 
-## Scheme
+## Схема
 ![](https://github.com/semyon-dev/hackuniversity/blob/master/scheme.png) 
 
 ## LICENSE
-MIT
+![MIT](https://github.com/semyon-dev/hackuniversity/blob/master/LICENSE)
