@@ -24,7 +24,6 @@ func ConnectClickhouse() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	connStr = "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 	Clicconn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000?debug=true")
 	if err != nil {
@@ -97,7 +96,13 @@ func NewEvent(param string, author string) {
 }
 
 func ConnectPostgres() {
-	var err error
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	connStr = "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
+	//connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
+
 	Conn, err = sql.Open("postgres", connStr)
 	if err != nil {
 		fmt.Println(err)
