@@ -6,6 +6,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	_ "github.com/lib/pq"
 	"log"
+	"time"
 )
 
 var Conn *sql.DB
@@ -28,6 +29,7 @@ func ConnectClickhouse() {
 	}
 	fmt.Println("-------------------")
 
+	// журнал всех событий от opc server
 	_, err = Clicconn.Exec(`
 		CREATE TABLE IF NOT EXISTS journal (
 			PRESSURE   Float64,
@@ -47,6 +49,7 @@ func ConnectClickhouse() {
 		log.Println("ошибка при создании таблицы journal", err)
 	}
 
+	// журнал событий изменений критических параметров
 	_, err = Clicconn.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 			PARAM  String,
@@ -58,6 +61,27 @@ func ConnectClickhouse() {
 
 	if err != nil {
 		log.Println("ошибка при создании таблицы events", err)
+	}
+}
+
+// создайние event в clickouse
+func NewEvent(param string, author string) {
+	var (
+		tx, _   = Clicconn.Begin()
+		stmt, _ = tx.Prepare("INSERT INTO events (PARAM, AUTHOR, action_day, action_time) VALUES (?, ?, ?, ?)")
+	)
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(
+		param,
+		author,
+		time.Now(),
+		time.Now(),
+	); err != nil {
+		log.Println(err)
+	}
+	if err := tx.Commit(); err != nil {
+		log.Println(err)
 	}
 }
 

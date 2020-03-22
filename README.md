@@ -1,5 +1,5 @@
 # hackuniversity 2020
-team's name: time walkers
+Команда: time walkers
 
 # Используемые технологии
 * Go v1.14

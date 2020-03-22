@@ -43,16 +43,21 @@ func main() {
 			})
 		}
 		err = updateCritical(critical.Name, critical.Min, critical.Max)
+		var status int
+		var message string
 		if err != nil {
-			context.JSON(500, gin.H{
-				"status": "ERROR",
-			})
+			message = "ERROR"
+			status = 500
 			fmt.Println(err)
 		} else {
-			context.JSON(200, gin.H{
-				"status": "OK",
-			})
+			message = "OK"
+			status = 200
 		}
+		// TODO: author name and min, max values
+		db.NewEvent(critical.Name, "noname")
+		context.JSON(status, gin.H{
+			"message": message,
+		})
 	})
 
 	// test url: /average?paramName=HUMIDITY&dateStart=2020-03-20&dateEnd=2020-03-30&timeStart=00:00:00&timeEnd=00:00:00
