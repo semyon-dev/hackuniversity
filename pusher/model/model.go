@@ -9,5 +9,4 @@ type Data struct {
 	MASS     float64 `json:"MASS"`
 	WATER    float64 `json:"WATER"`
 	LEVELCO2 float64 `json:"LEVELCO2"`
-	MESSAGE  string  `json:"MESSAGE"`
 }

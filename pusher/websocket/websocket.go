@@ -43,7 +43,7 @@ func Run() {
 
 	done := make(chan struct{})
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Millisecond * 500)
 	defer ticker.Stop()
 
 	for {
@@ -53,7 +53,7 @@ func Run() {
 		case t := <-ticker.C:
 			dataJson, data := opc.GetData()
 			// отправялемь данные сразу и в бд и в вебсокет
-			db.Save(data)
+			go db.Save(data)
 			err := c.WriteMessage(websocket.TextMessage, dataJson)
 			if err != nil {
 				log.Println("write:", err)

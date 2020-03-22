@@ -145,7 +145,7 @@ func main() {
 
 		max := 24 - len(res)
 		for i := len(res); i <= max; i++ {
-			res = append(res, 0)
+			res = append(res, float64(i))
 		}
 		context.JSON(200, gin.H{"data": res})
 	})

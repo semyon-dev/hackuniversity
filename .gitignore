@@ -19,3 +19,6 @@ log.txt
 
 # Dependency directories (remove the comment below to include it)
 opc/node_modules
+node_modules/
+unloader/package-lock.json
+unloader/unloader.js
