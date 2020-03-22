@@ -112,42 +112,42 @@ func ConnectPostgres() {
 		fmt.Println(err)
 	}
 
-	listNames := []string{
-		"PRESSURE",
-		"HUMIDITY",
-		"TEMPHOME",
-		"TEMPWORK",
-		"LEVELPH",
-		"MASS",
-		"WATER",
-		"LEVELCO2",
-	}
-
-	var haveDefaults = false
-	rows, err := Conn.Query("SELECT id FROM criticals LIMIT 20")
-	if err != nil {
-		fmt.Println(err)
-	}
-	var id int
-	for rows.Next() {
-		err = rows.Scan(&id)
-		if err != nil {
-			fmt.Println(err)
-		}
-		if id != 1 {
-			haveDefaults = true
-		}
-	}
-
-	if !haveDefaults {
-		for _, i := range listNames {
-			createDefaults := "INSERT INTO criticals(paramname,minimum,maximum) VALUES ($1,2,98)"
-			_, err = Conn.Exec(createDefaults, i)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-	}
+	//listNames := []string{
+	//	"PRESSURE",
+	//	"HUMIDITY",
+	//	"TEMPHOME",
+	//	"TEMPWORK",
+	//	"LEVELPH",
+	//	"MASS",
+	//	"WATER",
+	//	"LEVELCO2",
+	//}
+	//
+	//var haveDefaults = false
+	//rows, err := Conn.Query("SELECT id FROM criticals LIMIT 20")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//var id int
+	//for rows.Next() {
+	//	err = rows.Scan(&id)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	if id != 1 {
+	//		haveDefaults = true
+	//	}
+	//}
+	//
+	//if !haveDefaults {
+	//	for _, i := range listNames {
+	//		createDefaults := "INSERT INTO criticals(paramname,minimum,maximum) VALUES ($1,2,98)"
+	//		_, err = Conn.Exec(createDefaults, i)
+	//		if err != nil {
+	//			fmt.Println(err)
+	//		}
+	//	}
+	//}
 
 	fmt.Println("connected successfully....")
 }
