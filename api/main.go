@@ -8,6 +8,7 @@ import (
 	"github.com/semyon-dev/hackuniversity/api/db"
 	"github.com/semyon-dev/hackuniversity/api/model"
 	"math"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -150,12 +151,13 @@ func main() {
 	})
 
 	r.GET("/errors", func(context *gin.Context) {
-		dateStart := context.Query("dateStart")
-		dateEnd := context.Query("dateEnd")
 
-		periodErrors := db.GetErrors(dateStart, dateEnd)
-		fmt.Println(periodErrors)
+		dateStart := context.DefaultQuery("dateStart","today")
+		dateEnd := context.DefaultQuery("dateEnd","now")
+		limit := context.DefaultQuery("limit","10")
+		limitInt,_:=strconv.Atoi(limit)
 
+		periodErrors := db.GetErrors(dateStart, dateEnd,limitInt)
 
 		context.JSON(200, gin.H{
 			"errors": periodErrors,

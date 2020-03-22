@@ -240,29 +240,57 @@ func GetCriticals() []model.Criticals {
 }
 
 
-func GetErrors(dateStart,dateEnd string)[]model.Error{
-	execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2"
-	rows, err := Conn.Query(execStr,dateStart,dateEnd)
-	if err != nil {
-		fmt.Println("" + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		panic(err)
-	}
+func GetErrors(dateStart,dateEnd string,limit int)[]model.Error{
 
 	var criticalErrors []model.Error
-	var dateTime,paramName,message string
-	var paramValue float32
-	for rows.Next() {
-		err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
-		if err!=nil{
-			fmt.Println(err)
-		}
-		criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+
+	if dateStart=="today"{
+		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors ORDER BY id DESC LIMIT $1"
+		rows, err := Conn.Query(execStr,limit)
 		if err != nil {
-			fmt.Println(err)
+			panic(err)
 		}
-		criticalErrors = append(criticalErrors,criticalError)
-		fmt.Println(dateTime,paramName)
+
+		var dateTime,paramName,message string
+		var paramValue float32
+		for rows.Next() {
+			err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
+			if err!=nil{
+				fmt.Println(err)
+			}
+			criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+			if err != nil {
+				fmt.Println(err)
+			}
+			criticalErrors = append(criticalErrors,criticalError)
+			fmt.Println(dateTime,paramName)
+		}
+	}else {
+		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2 LIMIT $3"
+		rows, err := Conn.Query(execStr,dateStart,dateEnd,limit)
+		if err != nil {
+			panic(err)
+		}
+
+
+		var dateTime,paramName,message string
+		var paramValue float32
+		for rows.Next() {
+			err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
+			if err!=nil{
+				fmt.Println(err)
+			}
+			criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+			if err != nil {
+				fmt.Println(err)
+			}
+			criticalErrors = append(criticalErrors,criticalError)
+			fmt.Println(dateTime,paramName)
+		}
 	}
+
+
+
 
 	return criticalErrors
 }
