@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,6 @@ import (
 	"github.com/semyon-dev/hackuniversity/api/db"
 	"github.com/semyon-dev/hackuniversity/api/model"
 	"math"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -24,7 +24,7 @@ func main() {
 	r.GET("/criticals", func(context *gin.Context) {
 
 		criticals := make(map[string]map[string]float64)
-		for _, i := range getCriticals() {
+		for _, i := range db.GetCriticals() {
 			criticals[i.Name] = map[string]float64{"min": i.Min, "max": i.Max}
 		}
 
@@ -42,7 +42,7 @@ func main() {
 				"message": err,
 			})
 		}
-		err = updateCritical(critical.Name, critical.Min, critical.Max)
+		err = db.UpdateCritical(critical.Name, critical.Min, critical.Max)
 		var status int
 		var message string
 		if err != nil {
@@ -66,7 +66,7 @@ func main() {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
-		params := averageValue(name, dateTimeStart, dateTimeEnd)
+		params := db.AverageValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
 			gin.H{
 				"parameters": params,
@@ -77,7 +77,7 @@ func main() {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
-		params := maxValue(name, dateTimeStart, dateTimeEnd)
+		params := db.MaxValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
 			gin.H{
 				"parameters": params,
@@ -88,7 +88,7 @@ func main() {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 		fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
-		params := minValue(name, dateTimeStart, dateTimeEnd)
+		params := db.MinValue(name, dateTimeStart, dateTimeEnd)
 		context.JSON(200,
 			gin.H{
 				"parameters": params,
@@ -98,9 +98,9 @@ func main() {
 	r.GET("/maindata", func(context *gin.Context) {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 
-		min := minValue(name, dateTimeStart, dateTimeEnd)
-		max := maxValue(name, dateTimeStart, dateTimeEnd)
-		avg := averageValue(name, dateTimeStart, dateTimeEnd)
+		min := db.MinValue(name, dateTimeStart, dateTimeEnd)
+		max := db.MaxValue(name, dateTimeStart, dateTimeEnd)
+		avg := db.AverageValue(name, dateTimeStart, dateTimeEnd)
 
 		if math.IsNaN(avg) {
 			avg = 0
@@ -150,12 +150,33 @@ func main() {
 		context.JSON(200, gin.H{"data": res})
 	})
 
+	r.GET("/errors", func(context *gin.Context) {
+		dateStart:=context.Query("dateStart")
+		dateEnd:=context.Query("dateEnd")
+
+		periodErrors:=db.GetErrors(dateStart,dateEnd)
+
+		jsonData,err:=json.Marshal(periodErrors)
+		if err!=nil{
+			fmt.Println(err)
+		}
+
+		context.JSON(200,gin.H{
+			"errors":jsonData,
+		})
+	})
+
+
+
+
+
 	fmt.Println("запуск API на :5000...")
 	err := r.Run(":5000")
 	if err != nil {
 		fmt.Println("ошибка при запуске API:", err)
 	}
 }
+
 
 // получение границ даты и времени из URL
 func nameDateTimes(context *gin.Context) (string, string, string) {
@@ -183,116 +204,4 @@ func nameDateTimes(context *gin.Context) (string, string, string) {
 	}
 
 	return name, dateTimeStart, dateTimeEnd
-}
-
-func averageValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-	rows, err := db.Clicconn.Query(execStr)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var val float64
-	for rows.Next() {
-		err = rows.Scan(&val)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	return val
-}
-
-func maxValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-	rows, err := db.Clicconn.Query(execStr)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var val float64
-	for rows.Next() {
-		err = rows.Scan(&val)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	return val
-}
-
-func minValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-	rows, err := db.Clicconn.Query(execStr)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var val float64
-	for rows.Next() {
-		err = rows.Scan(&val)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	return val
-}
-
-// unused:
-func newDate(date string) model.Date {
-	vals := strings.Split(date, ".")
-
-	day, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	month, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	year, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	return model.Date{Day: day, Month: month, Year: year}
-}
-
-// unused:
-func daysBetween(dateStart, dateEnd model.Date) {
-	date1 := time.Date(dateStart.Year, time.Month(dateStart.Month), dateStart.Day, 0, 0, 0, 0, time.UTC)
-	date2 := time.Date(dateEnd.Year, time.Month(dateEnd.Month), dateEnd.Day, 0, 0, 0, 0, time.UTC)
-	days := int(date2.Sub(date1))
-	fmt.Println(days)
-}
-
-// unused:
-func insertMinMax(name string, min float64, max float64) {
-	_, err := db.Conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-func updateCritical(name string, min, max float64) error {
-	_, err := db.Conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
-	return err
-}
-
-func getCriticals() []model.Criticals {
-	rows, err := db.Conn.Query("SELECT paramname,minimum,maximum FROM criticals")
-	if err != nil {
-		fmt.Println(err)
-	}
-	var criticals []model.Criticals
-	var name string
-	var min, max float64
-	for rows.Next() {
-		err = rows.Scan(&name, &min, &max)
-		if err != nil {
-			fmt.Println(err)
-		}
-		criticals = append(criticals, model.Criticals{Name: name, Min: min, Max: max})
-	}
-
-	return criticals
 }

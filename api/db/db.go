@@ -6,8 +6,11 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/semyon-dev/hackuniversity/api/model"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -112,42 +115,151 @@ func ConnectPostgres() {
 		fmt.Println(err)
 	}
 
-	//listNames := []string{
-	//	"PRESSURE",
-	//	"HUMIDITY",
-	//	"TEMPHOME",
-	//	"TEMPWORK",
-	//	"LEVELPH",
-	//	"MASS",
-	//	"WATER",
-	//	"LEVELCO2",
-	//}
-	//
-	//var haveDefaults = false
-	//rows, err := Conn.Query("SELECT id FROM criticals LIMIT 20")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//var id int
-	//for rows.Next() {
-	//	err = rows.Scan(&id)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//	if id != 1 {
-	//		haveDefaults = true
-	//	}
-	//}
-	//
-	//if !haveDefaults {
-	//	for _, i := range listNames {
-	//		createDefaults := "INSERT INTO criticals(paramname,minimum,maximum) VALUES ($1,2,98)"
-	//		_, err = Conn.Exec(createDefaults, i)
-	//		if err != nil {
-	//			fmt.Println(err)
-	//		}
-	//	}
-	//}
-
 	fmt.Println("connected successfully....")
 }
+
+
+
+
+
+func AverageValue(paramName, dateStart, dateEnd string) float64 {
+	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	rows, err := Clicconn.Query(execStr)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var val float64
+	for rows.Next() {
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	return val
+}
+
+func MaxValue(paramName, dateStart, dateEnd string) float64 {
+	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	rows, err := Clicconn.Query(execStr)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var val float64
+	for rows.Next() {
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	return val
+}
+
+func MinValue(paramName, dateStart, dateEnd string) float64 {
+	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	rows, err := Clicconn.Query(execStr)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var val float64
+	for rows.Next() {
+		err = rows.Scan(&val)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	return val
+}
+
+// unused:
+func newDate(date string) model.Date {
+	vals := strings.Split(date, ".")
+
+	day, err := strconv.Atoi(vals[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+	month, err := strconv.Atoi(vals[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+	year, err := strconv.Atoi(vals[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+	return model.Date{Day: day, Month: month, Year: year}
+}
+
+// unused:
+func daysBetween(dateStart, dateEnd model.Date) {
+	date1 := time.Date(dateStart.Year, time.Month(dateStart.Month), dateStart.Day, 0, 0, 0, 0, time.UTC)
+	date2 := time.Date(dateEnd.Year, time.Month(dateEnd.Month), dateEnd.Day, 0, 0, 0, 0, time.UTC)
+	days := int(date2.Sub(date1))
+	fmt.Println(days)
+}
+
+// unused:
+func insertMinMax(name string, min float64, max float64) {
+	_, err := Conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func UpdateCritical(name string, min, max float64) error {
+	_, err := Conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
+	return err
+}
+
+func GetCriticals() []model.Criticals {
+	rows, err := Conn.Query("SELECT paramname,minimum,maximum FROM criticals")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var criticals []model.Criticals
+	var name string
+	var min, max float64
+	for rows.Next() {
+		err = rows.Scan(&name, &min, &max)
+		if err != nil {
+			fmt.Println(err)
+		}
+		criticals = append(criticals, model.Criticals{Name: name, Min: min, Max: max})
+	}
+
+	return criticals
+}
+
+
+func GetErrors(dateStart,dateEnd string)[]model.Error{
+	execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	rows, err := Conn.Query(execStr)
+	if err != nil {
+		fmt.Println("" + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		panic(err)
+	}
+
+	var criticalErrors []model.Error
+	var dateTime,paramName,message string
+	var paramValue float32
+	for rows.Next() {
+		err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
+		if err!=nil{
+			fmt.Println(err)
+		}
+		criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+		if err != nil {
+			fmt.Println(err)
+		}
+		criticalErrors = append(criticalErrors,criticalError)
+	}
+
+	return criticalErrors
+}
+
+
+
