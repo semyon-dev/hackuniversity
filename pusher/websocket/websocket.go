@@ -43,7 +43,7 @@ func Run() {
 
 	done := make(chan struct{})
 
-	ticker := time.NewTicker(time.Millisecond * 500)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {

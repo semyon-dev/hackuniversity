@@ -241,14 +241,14 @@ func GetErrors(dateStart, dateEnd string, limit int) []model.Error {
 	var criticalErrors []model.Error
 
 	if dateStart == "today" {
-		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors ORDER BY id DESC LIMIT $1"
+		execStr := "SELECT datetime ,paramName,paramValue,message FROM errors ORDER BY id DESC LIMIT $1"
 		rows, err := Conn.Query(execStr, limit)
 		if err != nil {
 			panic(err)
 		}
 
 		var dateTime, paramName, message string
-		var paramValue float32
+		var paramValue float64
 		for rows.Next() {
 			err = rows.Scan(&dateTime, &paramName, &paramValue, &message)
 			if err != nil {
@@ -262,14 +262,14 @@ func GetErrors(dateStart, dateEnd string, limit int) []model.Error {
 			fmt.Println(dateTime, paramName)
 		}
 	} else {
-		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2 LIMIT $3"
+		execStr := "SELECT datetime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2 LIMIT $3"
 		rows, err := Conn.Query(execStr, dateStart, dateEnd, limit)
 		if err != nil {
 			panic(err)
 		}
 
 		var dateTime, paramName, message string
-		var paramValue float32
+		var paramValue float64
 		for rows.Next() {
 			err = rows.Scan(&dateTime, &paramName, &paramValue, &message)
 			if err != nil {

@@ -46,7 +46,7 @@ func Connect() {
 
 	_, err = conn.Exec(`CREATE TABLE IF NOT EXISTS errors(
  					id SERIAL PRIMARY KEY,
- 					dateTime Date,
+ 					dateTime timestamp,
  					paramName varchar(20),
  					paramValue float8,
  					message text			   
