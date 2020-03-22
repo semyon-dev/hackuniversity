@@ -38,5 +38,8 @@ opc - симулятор opc ua server который генерирует да�
 # Схема
 ![](https://github.com/semyon-dev/hackuniversity/blob/master/scheme.png) 
 
+# [EXPERIMENT] Запуск всех микросервисов сразу
+`bash run.sh`
+
 # LICENSE
 [MIT](https://github.com/semyon-dev/hackuniversity/blob/master/LICENSE)
