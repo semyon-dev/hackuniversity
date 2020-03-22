@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -12,10 +13,16 @@ import (
 
 var Conn *sql.DB
 var Clicconn *sql.DB
-var connStr = "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
+var connStr string
 
 func ConnectClickhouse() {
 	var err error
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	connStr = "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
+
 	Clicconn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000?debug=true")
 	if err != nil {
 		log.Println("ошибка при подключении к clickhouse", err)
