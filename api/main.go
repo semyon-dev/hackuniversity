@@ -53,8 +53,11 @@ func main() {
 			message = "OK"
 			status = 200
 		}
+
+
+
 		// TODO: author name and min, max values
-		db.NewEvent(critical.Name, critical.Author)
+		db.NewEvent(critical.Name, critical.Author,critical.Min,critical.Max)
 		context.JSON(status, gin.H{
 			"message": message,
 		})

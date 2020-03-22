@@ -10,8 +10,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -66,7 +64,11 @@ func ConnectClickhouse() {
 			PARAM  String,
 			AUTHOR String,
 			action_day   Date,
-			action_time  DateTime
+			action_time  DateTime,
+			to_min float ,
+			from_min float,
+			to_max float ,
+			from_max float
 		) engine=Memory
 	`)
 
@@ -76,10 +78,22 @@ func ConnectClickhouse() {
 }
 
 // создайние event в clickouse
-func NewEvent(param string, author string) {
+func NewEvent(param string, author string,min,max float64) {
+
+	sqlStr:="SELECT maximum,minimum FROM criticals WHERE paramname =?"
+	rows,err:=Conn.Query(sqlStr,param)
+	if err!=nil{
+		fmt.Println(err)
+	}
+
+	var oldMin,oldMax float64
+	for rows.Next(){
+		rows.Scan(&oldMin,&oldMax)
+	}
+
 	var (
 		tx, _   = Clicconn.Begin()
-		stmt, _ = tx.Prepare("INSERT INTO events (PARAM, AUTHOR, action_day, action_time) VALUES (?, ?, ?, ?)")
+		stmt, _ = tx.Prepare("INSERT INTO events (PARAM, AUTHOR, action_day, action_time,from_min,to_min,from_max,to_max) VALUES (?, ?, ?, ?,?,?)")
 	)
 	defer stmt.Close()
 
@@ -88,6 +102,10 @@ func NewEvent(param string, author string) {
 		author,
 		time.Now(),
 		time.Now(),
+		oldMin,
+		min,
+		oldMax,
+		max,
 	); err != nil {
 		log.Println(err)
 	}
@@ -177,40 +195,7 @@ func MinValue(paramName, dateStart, dateEnd string) float64 {
 	return val
 }
 
-// unused:
-func newDate(date string) model.Date {
-	vals := strings.Split(date, ".")
 
-	day, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	month, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	year, err := strconv.Atoi(vals[0])
-	if err != nil {
-		fmt.Println(err)
-	}
-	return model.Date{Day: day, Month: month, Year: year}
-}
-
-// unused:
-func daysBetween(dateStart, dateEnd model.Date) {
-	date1 := time.Date(dateStart.Year, time.Month(dateStart.Month), dateStart.Day, 0, 0, 0, 0, time.UTC)
-	date2 := time.Date(dateEnd.Year, time.Month(dateEnd.Month), dateEnd.Day, 0, 0, 0, 0, time.UTC)
-	days := int(date2.Sub(date1))
-	fmt.Println(days)
-}
-
-// unused:
-func insertMinMax(name string, min float64, max float64) {
-	_, err := Conn.Exec("INSERT INTO criticals(paramname,minimum,maximum) VALUES($1,$2,$3)", name, min, max)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
 
 func UpdateCritical(name string, min, max float64) error {
 	_, err := Conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
