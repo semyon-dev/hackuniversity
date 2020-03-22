@@ -1,7 +1,7 @@
 # hackuniversity 2020
 team's name: time walkers
 
-## Используемые технологии
+# Используемые технологии
 * Go v1.14
 * Clickhouse
 * OPC UA Simulator
@@ -35,8 +35,8 @@ HTTP API отвечает за получение/изменение min и max 
 `node opc.js` \
 opc - симулятор opc ua server который генерирует данные типа float каждую секунду
 
-## Схема
+# Схема
 ![](https://github.com/semyon-dev/hackuniversity/blob/master/scheme.png) 
 
-## LICENSE
+# LICENSE
 ![MIT](https://github.com/semyon-dev/hackuniversity/blob/master/LICENSE)
