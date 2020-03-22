@@ -65,10 +65,10 @@ func ConnectClickhouse() {
 			AUTHOR String,
 			action_day   Date,
 			action_time  DateTime,
-			to_min float ,
-			from_min float,
-			to_max float ,
-			from_max float
+			to_min Float64 ,
+			from_min Float64,
+			to_max Float64 ,
+			from_max Float64
 		) engine=Memory
 	`)
 
@@ -78,17 +78,17 @@ func ConnectClickhouse() {
 }
 
 // создайние event в clickouse
-func NewEvent(param string, author string,min,max float64) {
+func NewEvent(param string, author string, min, max float64) {
 
-	sqlStr:="SELECT maximum,minimum FROM criticals WHERE paramname =?"
-	rows,err:=Conn.Query(sqlStr,param)
-	if err!=nil{
+	sqlStr := "SELECT maximum,minimum FROM criticals WHERE paramname =$1"
+	rows, err := Conn.Query(sqlStr, param)
+	if err != nil {
 		fmt.Println(err)
 	}
 
-	var oldMin,oldMax float64
-	for rows.Next(){
-		rows.Scan(&oldMin,&oldMax)
+	var oldMin, oldMax float64
+	for rows.Next() {
+		rows.Scan(&oldMin, &oldMax)
 	}
 
 	var (
@@ -194,8 +194,6 @@ func MinValue(paramName, dateStart, dateEnd string) float64 {
 
 	return val
 }
-
-
 
 func UpdateCritical(name string, min, max float64) error {
 	_, err := Conn.Exec("UPDATE criticals SET minimum = $2,maximum = $3 WHERE paramname = $1", name, min, max)
