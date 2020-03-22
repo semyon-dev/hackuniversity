@@ -124,12 +124,8 @@ func ConnectPostgres() {
 	fmt.Println("connected successfully....")
 }
 
-
-
-
-
 func AverageValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -146,7 +142,7 @@ func AverageValue(paramName, dateStart, dateEnd string) float64 {
 }
 
 func MaxValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -164,7 +160,7 @@ func MaxValue(paramName, dateStart, dateEnd string) float64 {
 }
 
 func MinValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -240,89 +236,82 @@ func GetCriticals() []model.Criticals {
 	return criticals
 }
 
-
-func GetErrors(dateStart,dateEnd string,limit int)[]model.Error{
+func GetErrors(dateStart, dateEnd string, limit int) []model.Error {
 
 	var criticalErrors []model.Error
 
-	if dateStart=="today"{
+	if dateStart == "today" {
 		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors ORDER BY id DESC LIMIT $1"
-		rows, err := Conn.Query(execStr,limit)
+		rows, err := Conn.Query(execStr, limit)
 		if err != nil {
 			panic(err)
 		}
 
-		var dateTime,paramName,message string
+		var dateTime, paramName, message string
 		var paramValue float32
 		for rows.Next() {
-			err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
-			if err!=nil{
-				fmt.Println(err)
-			}
-			criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+			err = rows.Scan(&dateTime, &paramName, &paramValue, &message)
 			if err != nil {
 				fmt.Println(err)
 			}
-			criticalErrors = append(criticalErrors,criticalError)
-			fmt.Println(dateTime,paramName)
+			criticalError := model.Error{Message: message, DateTime: dateTime, ParamValue: paramValue, ParamName: paramName}
+			if err != nil {
+				fmt.Println(err)
+			}
+			criticalErrors = append(criticalErrors, criticalError)
+			fmt.Println(dateTime, paramName)
 		}
-	}else {
+	} else {
 		execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2 LIMIT $3"
-		rows, err := Conn.Query(execStr,dateStart,dateEnd,limit)
+		rows, err := Conn.Query(execStr, dateStart, dateEnd, limit)
 		if err != nil {
 			panic(err)
 		}
 
-
-		var dateTime,paramName,message string
+		var dateTime, paramName, message string
 		var paramValue float32
 		for rows.Next() {
-			err = rows.Scan(&dateTime,&paramName,&paramValue,&message)
-			if err!=nil{
-				fmt.Println(err)
-			}
-			criticalError:=model.Error{Message:message,DateTime:dateTime,ParamValue:paramValue,ParamName:paramName}
+			err = rows.Scan(&dateTime, &paramName, &paramValue, &message)
 			if err != nil {
 				fmt.Println(err)
 			}
-			criticalErrors = append(criticalErrors,criticalError)
-			fmt.Println(dateTime,paramName)
+			criticalError := model.Error{Message: message, DateTime: dateTime, ParamValue: paramValue, ParamName: paramName}
+			if err != nil {
+				fmt.Println(err)
+			}
+			criticalErrors = append(criticalErrors, criticalError)
+			fmt.Println(dateTime, paramName)
 		}
 	}
-
-
-
 
 	return criticalErrors
 }
 
+func GetHourlyErrors(paramName, date string) []float64 {
 
-func GetHourlyErrors(paramName,date string)[]float64{
-
-	timeStart:=model.Time{Hour:0,Minute:0,Second:0}
-	timeEnd:=model.Time{Hour:1,Minute:0,Second:0}
+	timeStart := model.Time{Hour: 0, Minute: 0, Second: 0}
+	timeEnd := model.Time{Hour: 1, Minute: 0, Second: 0}
 
 	var values []float64
 
-	for i:=0;i<22;i++{
-		dateStart:=date+" "+timeStart.ToStringHour()
-		dateEnd:=date+" "+timeEnd.ToStringHour()
-		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-		rows,err:=Clicconn.Query(execStr)
-		if err!=nil{
+	for i := 0; i < 24; i++ {
+		dateStart := date + " " + timeStart.ToStringHour()
+		dateEnd := date + " " + timeEnd.ToStringHour()
+		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
+		rows, err := Clicconn.Query(execStr)
+		if err != nil {
 			panic(err)
 		}
 		var value float64
-		for rows.Next(){
+		for rows.Next() {
 			rows.Scan(&value)
 		}
-		if math.IsNaN(value){
+		if math.IsNaN(value) {
 			value = 0
 		}
-		values=append(values,value)
+		values = append(values, value)
 		timeStart.NextHour()
 		timeEnd.NextHour()
-
 	}
 
 	//execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
@@ -333,10 +322,3 @@ func GetHourlyErrors(paramName,date string)[]float64{
 
 	return values
 }
-
-
-
-
-
-
-
