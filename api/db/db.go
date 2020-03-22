@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/semyon-dev/hackuniversity/api/model"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -294,6 +295,48 @@ func GetErrors(dateStart,dateEnd string,limit int)[]model.Error{
 
 	return criticalErrors
 }
+
+
+func GetHourlyErrors(paramName,date string)[]float64{
+
+	timeStart:=model.Time{Hour:0,Minute:0,Second:0}
+	timeEnd:=model.Time{Hour:1,Minute:0,Second:0}
+
+	var values []float64
+
+	for i:=0;i<22;i++{
+		dateStart:=date+" "+timeStart.ToStringHour()
+		dateEnd:=date+" "+timeEnd.ToStringHour()
+		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+		rows,err:=Clicconn.Query(execStr)
+		if err!=nil{
+			panic(err)
+		}
+		var value float64
+		for rows.Next(){
+			rows.Scan(&value)
+		}
+		if math.IsNaN(value){
+			value = 0
+		}
+		values=append(values,value)
+		timeStart.NextHour()
+		timeEnd.NextHour()
+
+	}
+
+	//execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	//rows, err := Clicconn.Query(execStr)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+
+	return values
+}
+
+
+
+
 
 
 

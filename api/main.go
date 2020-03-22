@@ -114,6 +114,7 @@ func main() {
 			})
 	})
 
+	// old version
 	r.GET("/hourly", func(context *gin.Context) {
 		param := context.Query("param")
 		_, dateTimeStart, dateTimeEnd := nameDateTimes(context)
@@ -147,7 +148,28 @@ func main() {
 		for i := len(res); i <= max; i++ {
 			res = append(res, float64(i))
 		}
+
+
+
+
+
 		context.JSON(200, gin.H{"data": res})
+	})
+
+	r.GET("/hourly2", func(context *gin.Context) {
+
+		today:= strings.Split(time.Now().String()," ")[0]
+		fmt.Println(today +" - is today!!!!!!!!!!!!!!!")
+		param := context.Query("param")
+		date:= context.DefaultQuery("date",today)
+
+
+		values:=db.GetHourlyErrors(param,date)
+		fmt.Println(values)
+
+		context.JSON(200,gin.H{
+			"values":values,
+		})
 	})
 
 	r.GET("/errors", func(context *gin.Context) {
