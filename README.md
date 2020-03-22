@@ -39,4 +39,4 @@ opc - симулятор opc ua server который генерирует да�
 ![](https://github.com/semyon-dev/hackuniversity/blob/master/scheme.png) 
 
 # LICENSE
-![MIT](https://github.com/semyon-dev/hackuniversity/blob/master/LICENSE)
+[MIT](https://github.com/semyon-dev/hackuniversity/blob/master/LICENSE)
