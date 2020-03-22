@@ -6,6 +6,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	"github.com/semyon-dev/hackuniversity/pusher/model"
 	"log"
+	"os"
 	"time"
 )
 
@@ -13,7 +14,7 @@ var conn *sql.DB
 
 func Connect() {
 	var err error
-	conn, err = sql.Open("clickhouse", "tcp://192.168.1.106:9000?debug=true")
+	conn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000?debug=true")
 	if err != nil {
 		log.Println("ошибка при подключении к clickhouse", err)
 	}

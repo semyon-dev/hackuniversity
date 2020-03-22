@@ -5,10 +5,10 @@ const opcua = require("node-opcua");
 const server = new opcua.OPCUAServer({
     port: 4334, // the port of the listening socket of the server
     resourcePath: "/", // this path will be added to the endpoint resource name
-     buildInfo : {
+    buildInfo: {
         productName: "MySampleServer1",
         buildNumber: "7658",
-        buildDate: new Date(2014,5,2)
+        buildDate: new Date(2014, 5, 2)
     }
 });
 const generatorPressure = () => parseFloat((Math.random() * (300000 - 50000) + 50000).toFixed(2));
@@ -21,17 +21,18 @@ const generatorLevelPh = () => parseFloat((Math.random() * (14 - (-1)) + (-1)).t
 
 function post_initialize() {
     console.log("initialized");
+
     function construct_my_address_space(server) {
-    
+
         const addressSpace = server.engine.addressSpace;
         const namespace = addressSpace.getOwnNamespace();
-    
+
         // declare a new object
         const device = namespace.addObject({
             organizedBy: addressSpace.rootFolder.objects,
             browseName: "MyDevice"
         });
-    
+
         // add some variables
         // add a variable named MyVariable1 to the newly created folder "MyDevice"
         let PRESSURE = generatorPressure();
@@ -43,7 +44,7 @@ function post_initialize() {
         let WATER = generatorWater();
         let LEVELCO2 = generatorLevelCo2();
         // emulate variable1 changing every 500 ms
-        setInterval(function(){  
+        setInterval(function () {
             PRESSURE = generatorPressure();
             HUMIDITY = generatorHumidity();
             TEMPHOME = generatorTemp();
@@ -52,8 +53,8 @@ function post_initialize() {
             MASS = generatorMass();
             WATER = generatorWater();
             LEVELCO2 = generatorLevelCo2();
-         }, 1000);
-        
+        }, 1000);
+
         namespace.addVariable({
             nodeId: "s=pressure",
             componentOf: device,
@@ -61,7 +62,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: PRESSURE });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: PRESSURE});
                 }
             }
         });
@@ -72,7 +73,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: HUMIDITY });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: HUMIDITY});
                 }
             }
         });
@@ -83,7 +84,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: TEMPHOME });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: TEMPHOME});
                 }
             }
         });
@@ -94,7 +95,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: TEMPWORK });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: TEMPWORK});
                 }
             }
         });
@@ -105,7 +106,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: LEVELPH });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: LEVELPH});
                 }
             }
         });
@@ -116,7 +117,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: LEVELCO2 });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: LEVELCO2});
                 }
             }
         });
@@ -127,7 +128,7 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: MASS });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: MASS});
                 }
             }
         });
@@ -138,11 +139,12 @@ function post_initialize() {
             dataType: "Double",
             value: {
                 get: function () {
-                    return new opcua.Variant({dataType: opcua.DataType.Double, value: WATER });
+                    return new opcua.Variant({dataType: opcua.DataType.Double, value: WATER});
                 }
             }
         });
         const os = require("os");
+
         /**
          * returns the percentage of free memory on the running machine
          * @return {double}
@@ -154,12 +156,14 @@ function post_initialize() {
         }
 
     }
+
     construct_my_address_space(server);
-    server.start(function() {
+    server.start(function () {
         console.log("Server is now listening ... ( press CTRL+C to stop)");
         console.log("port ", server.endpoints[0].port);
         const endpointUrl = server.endpoints[0].endpointDescriptions()[0].endpointUrl;
-        console.log(" the primary server endpoint url is ", endpointUrl );
+        console.log(" the primary server endpoint url is ", endpointUrl);
     });
 }
+
 server.initialize(post_initialize);

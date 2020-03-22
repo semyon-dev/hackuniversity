@@ -3,7 +3,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	_"github.com/lib/pq"
+	_ "github.com/lib/pq"
+	"os"
 )
 
 var conn *sql.DB
@@ -12,7 +13,7 @@ func Connect() {
 	var err error
 
 	// language=SQL
-	connStr := "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
+	connStr := "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 	conn, err = sql.Open("postgres", connStr)
 	if err != nil {

@@ -6,16 +6,17 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 	"time"
 )
 
 var Conn *sql.DB
 var Clicconn *sql.DB
-var connStr = "host=192.168.1.106 port=5432 user=semyon dbname=dbtest sslmode=disable"
+var connStr = "host=" + os.Getenv("POSTGRES_HOST") + " port=5432 user=semyon dbname=dbtest sslmode=disable"
 
 func ConnectClickhouse() {
 	var err error
-	Clicconn, err = sql.Open("clickhouse", "tcp://192.168.1.106:9000?debug=true")
+	Clicconn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000?debug=true")
 	if err != nil {
 		log.Println("ошибка при подключении к clickhouse", err)
 	}
