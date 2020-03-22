@@ -30,6 +30,8 @@ type Time struct {
 }
 
 
+
+
 func (time *Time)NextHour(){
 	time.Hour+=1
 }

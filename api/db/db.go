@@ -125,7 +125,7 @@ func ConnectPostgres() {
 }
 
 func AverageValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT avg(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -142,7 +142,7 @@ func AverageValue(paramName, dateStart, dateEnd string) float64 {
 }
 
 func MaxValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT MAX(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -160,7 +160,7 @@ func MaxValue(paramName, dateStart, dateEnd string) float64 {
 }
 
 func MinValue(paramName, dateStart, dateEnd string) float64 {
-	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+	execStr := "SELECT MIN(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 	rows, err := Clicconn.Query(execStr)
 	if err != nil {
 		fmt.Println(err)
@@ -297,9 +297,9 @@ func GetHourlyErrors(paramName, date string) []float64 {
 	for i := 0; i < 24; i++ {
 		dateStart := date + " " + timeStart.ToStringHour()
 		dateEnd := date + " " + timeEnd.ToStringHour()
-		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
+
+		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 		rows, err := Clicconn.Query(execStr)
-		fmt.Println("exec", execStr)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -310,12 +310,6 @@ func GetHourlyErrors(paramName, date string) []float64 {
 				fmt.Println(err)
 			}
 		}
-		fmt.Println(value)
-
-		//fmt.Println("(((((((((((((((((((((((")
-		//fmt.Println("dateStart", dateStart)
-		//fmt.Println("dateEnd", dateEnd)
-		//fmt.Println("(((((((((((((((((((((((")
 		if math.IsNaN(value) {
 			value = 0
 		}
