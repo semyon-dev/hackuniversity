@@ -13,9 +13,7 @@ var conn *sql.DB
 
 func Connect() {
 	var err error
-	// Димин порт
-	ip := "192.168.1.109"
-	conn, err = sql.Open("clickhouse", "tcp://"+ip+":9000?debug=true")
+	conn, err = sql.Open("clickhouse", "tcp://192.168.1.106:9000?debug=true")
 	if err != nil {
 		log.Println("ошибка при подключении к clickhouse", err)
 	}

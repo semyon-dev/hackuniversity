@@ -14,7 +14,7 @@ import (
 )
 
 var addr = flag.String("addr", os.Getenv("LOCAL_IP")+":8080", "http service address")
-var addrDimaWS = flag.String("addrDimaWS", "192.168.1.109:8080", "http service address")
+var addrDimaWS = flag.String("addrDimaWS", "192.168.1.106:8081", "http service address")
 
 func Run() {
 	flag.Parse()
