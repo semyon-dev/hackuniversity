@@ -7,7 +7,8 @@ type Date struct {
 }
 
 type Criticals struct {
-	Name string  `json:"param"`
-	Min  float64 `json:"min"`
-	Max  float64 `json:"max"`
+	Name   string  `json:"param"`
+	Min    float64 `json:"min"`
+	Max    float64 `json:"max"`
+	Author string  `json:"author"`
 }

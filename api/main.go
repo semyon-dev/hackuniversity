@@ -54,7 +54,7 @@ func main() {
 			status = 200
 		}
 		// TODO: author name and min, max values
-		db.NewEvent(critical.Name, "noname")
+		db.NewEvent(critical.Name, critical.Author)
 		context.JSON(status, gin.H{
 			"message": message,
 		})
@@ -117,8 +117,6 @@ func main() {
 	r.GET("/hourly", func(context *gin.Context) {
 		param := context.Query("param")
 		_, dateTimeStart, dateTimeEnd := nameDateTimes(context)
-		//dateStart := "2020.03.21"
-		//dateEnd := "2020.03.22"
 		execStr := "SELECT " + param + " FROM journal WHERE action_time BETWEEN toDateTime('" + dateTimeStart + "', 'Europe/Moscow')  AND toDateTime('" + dateTimeEnd + "', 'Europe/Moscow')"
 		rows, err := db.Clicconn.Query(execStr)
 		if err != nil {
@@ -144,13 +142,18 @@ func main() {
 				temp += 3600
 			}
 		}
+
+		max := 24 - len(res)
+		for i := len(res); i <= max; i++ {
+			res = append(res, 0)
+		}
 		context.JSON(200, gin.H{"data": res})
 	})
 
-	fmt.Println("запуск API на 5000 порту...")
+	fmt.Println("запуск API на :5000...")
 	err := r.Run(":5000")
 	if err != nil {
-		fmt.Println("ошибка при запуске API", err)
+		fmt.Println("ошибка при запуске API:", err)
 	}
 }
 

@@ -58,8 +58,8 @@ func checkCriticalParameters(jsonData []byte) {
 
 func checkValues(name string, dict map[string]map[string]float64, value float64) {
 	if (value < dict[name]["min"]) || (value > dict[name]["max"]) {
-		Log.Error(name + " - over normal value")
-		err := db.InsertError(name, name+" - over normal value", value)
+		Log.Error(name + " - превышено допустимое значение")
+		err := db.InsertError(name, name+" - превышено допустимое значение", value)
 		if err != nil {
 			fmt.Println(err)
 		}
