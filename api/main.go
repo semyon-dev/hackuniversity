@@ -60,7 +60,7 @@ func main() {
 		}
 	})
 
-	// test url: /period?paramName=HUMIDITY&dateStart=2020-03-20&dateEnd=2020-03-30&timeStart=00:00:00&timeEnd=00:00:00
+	// test url: /average?paramName=HUMIDITY&dateStart=2020-03-20&dateEnd=2020-03-30&timeStart=00:00:00&timeEnd=00:00:00
 	// return average value between start date and time and end date and time
 	r.GET("/average", func(context *gin.Context) {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
@@ -97,7 +97,6 @@ func main() {
 
 	r.GET("/maindata", func(context *gin.Context) {
 		name, dateTimeStart, dateTimeEnd := nameDateTimes(context)
-		// fmt.Println(name, dateTimeStart, dateTimeEnd, " values from query")
 
 		min := minValue(name, dateTimeStart, dateTimeEnd)
 		max := maxValue(name, dateTimeStart, dateTimeEnd)
@@ -111,6 +110,39 @@ func main() {
 			})
 	})
 
+	r.GET("/hourly", func(context *gin.Context) {
+		param := context.Query("param")
+		_, dateTimeStart, dateTimeEnd := nameDateTimes(context)
+		//dateStart := "2020.03.21"
+		//dateEnd := "2020.03.22"
+		execStr := "SELECT " + param + " FROM journal WHERE action_time BETWEEN toDateTime('" + dateTimeStart + "', 'Europe/Moscow')  AND toDateTime('" + dateTimeEnd + "', 'Europe/Moscow')"
+		rows, err := clicconn.Query(execStr)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		var val float64
+		var res = make([]float64, 0)
+		var hours = make([]float64, 86400)
+		temp := 3600
+		for i := 0; rows.Next(); i++ {
+			err = rows.Scan(&val)
+			if err != nil {
+				fmt.Println(err)
+			}
+			hours[i] = val
+			if i == temp {
+				summa := 0.0
+				for t := temp - 3600; t <= temp; t++ {
+					summa += hours[t]
+				}
+				res = append(res, summa/3600)
+				temp += 3600
+			}
+		}
+		context.JSON(200, res)
+	})
+
 	fmt.Println("запуск API на 5000 порту...")
 	err := r.Run(":5000")
 	if err != nil {
@@ -118,7 +150,7 @@ func main() {
 	}
 }
 
-// получение границ даты и времени из юрл
+// получение границ даты и времени из URL
 func nameDateTimes(context *gin.Context) (string, string, string) {
 	currentTime := time.Now().String()
 	strCurrTime := strings.Split(currentTime, ".")[0]
