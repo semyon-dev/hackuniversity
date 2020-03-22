@@ -115,7 +115,9 @@ func main() {
 	})
 
 	// old version
-	r.GET("/hourly", func(context *gin.Context) {
+	// DEPRECATED:
+	// DO NOT USE IT in production
+	r.GET("/hourlyOld", func(context *gin.Context) {
 		param := context.Query("param")
 		_, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 		execStr := "SELECT " + param + " FROM journal WHERE action_time BETWEEN toDateTime('" + dateTimeStart + "', 'Europe/Moscow')  AND toDateTime('" + dateTimeEnd + "', 'Europe/Moscow')"
@@ -152,8 +154,7 @@ func main() {
 		context.JSON(200, gin.H{"data": res})
 	})
 
-	r.GET("/hourly2", func(context *gin.Context) {
-
+	r.GET("/hourly", func(context *gin.Context) {
 		today := strings.Split(time.Now().String(), " ")[0]
 		param := context.Query("param")
 		date := context.DefaultQuery("date", today)
