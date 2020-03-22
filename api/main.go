@@ -118,7 +118,9 @@ func main() {
 	})
 
 	// old version
-	r.GET("/hourly", func(context *gin.Context) {
+	// DEPRECATED:
+	// DO NOT USE IT in production
+	r.GET("/hourlyOld", func(context *gin.Context) {
 		param := context.Query("param")
 		_, dateTimeStart, dateTimeEnd := nameDateTimes(context)
 		execStr := "SELECT " + param + " FROM journal WHERE action_time BETWEEN toDateTime('" + dateTimeStart + "', 'Europe/Moscow')  AND toDateTime('" + dateTimeEnd + "', 'Europe/Moscow')"
@@ -152,37 +154,27 @@ func main() {
 			res = append(res, float64(i))
 		}
 
-
-
-
-
 		context.JSON(200, gin.H{"data": res})
 	})
 
-	r.GET("/hourly2", func(context *gin.Context) {
-
-		today:= strings.Split(time.Now().String()," ")[0]
-		fmt.Println(today +" - is today!!!!!!!!!!!!!!!")
+	r.GET("/hourly", func(context *gin.Context) {
+		today := strings.Split(time.Now().String(), " ")[0]
 		param := context.Query("param")
-		date:= context.DefaultQuery("date",today)
-
-
-		values:=db.GetHourlyErrors(param,date)
-		fmt.Println(values)
-
-		context.JSON(200,gin.H{
-			"data":values,
+		date := context.DefaultQuery("date", today)
+		values := db.GetHourlyErrors(param, date)
+		context.JSON(200, gin.H{
+			"data": values,
 		})
 	})
 
 	r.GET("/errors", func(context *gin.Context) {
 
-		dateStart := context.DefaultQuery("dateStart","today")
-		dateEnd := context.DefaultQuery("dateEnd","now")
-		limit := context.DefaultQuery("limit","10")
-		limitInt,_:=strconv.Atoi(limit)
+		dateStart := context.DefaultQuery("dateStart", "today")
+		dateEnd := context.DefaultQuery("dateEnd", "now")
+		limit := context.DefaultQuery("limit", "10")
+		limitInt, _ := strconv.Atoi(limit)
 
-		periodErrors := db.GetErrors(dateStart, dateEnd,limitInt)
+		periodErrors := db.GetErrors(dateStart, dateEnd, limitInt)
 
 		context.JSON(200, gin.H{
 			"errors": periodErrors,

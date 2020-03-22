@@ -24,7 +24,7 @@ func ConnectClickhouse() {
 		log.Fatal("Error loading .env file")
 	}
 
-	Clicconn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000?debug=true")
+	Clicconn, err = sql.Open("clickhouse", "tcp://"+os.Getenv("CLICKHOUSE_HOST")+":9000")
 	if err != nil {
 		log.Println("ошибка при подключении к clickhouse", err)
 	}
@@ -282,14 +282,18 @@ func GetHourlyErrors(paramName, date string) []float64 {
 	for i := 0; i < 24; i++ {
 		dateStart := date + " " + timeStart.ToStringHour()
 		dateEnd := date + " " + timeEnd.ToStringHour()
+
 		execStr := "SELECT AVG(" + paramName + ") FROM journal WHERE action_time BETWEEN toDateTime('" + dateStart + "')  AND toDateTime('" + dateEnd + "')"
 		rows, err := Clicconn.Query(execStr)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 		var value float64
 		for rows.Next() {
-			rows.Scan(&value)
+			err := rows.Scan(&value)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 		if math.IsNaN(value) {
 			value = 0
