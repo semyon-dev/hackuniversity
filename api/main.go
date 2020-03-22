@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -151,24 +150,17 @@ func main() {
 	})
 
 	r.GET("/errors", func(context *gin.Context) {
-		dateStart:=context.Query("dateStart")
-		dateEnd:=context.Query("dateEnd")
+		dateStart := context.Query("dateStart")
+		dateEnd := context.Query("dateEnd")
 
-		periodErrors:=db.GetErrors(dateStart,dateEnd)
+		periodErrors := db.GetErrors(dateStart, dateEnd)
+		fmt.Println(periodErrors)
 
-		jsonData,err:=json.Marshal(periodErrors)
-		if err!=nil{
-			fmt.Println(err)
-		}
 
-		context.JSON(200,gin.H{
-			"errors":jsonData,
+		context.JSON(200, gin.H{
+			"errors": periodErrors,
 		})
 	})
-
-
-
-
 
 	fmt.Println("запуск API на :5000...")
 	err := r.Run(":5000")
@@ -176,7 +168,6 @@ func main() {
 		fmt.Println("ошибка при запуске API:", err)
 	}
 }
-
 
 // получение границ даты и времени из URL
 func nameDateTimes(context *gin.Context) (string, string, string) {

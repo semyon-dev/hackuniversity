@@ -241,8 +241,8 @@ func GetCriticals() []model.Criticals {
 
 
 func GetErrors(dateStart,dateEnd string)[]model.Error{
-	execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE action_time BETWEEN toDateTime('" + dateStart + "', 'Europe/Moscow')  AND toDateTime('" + dateEnd + "', 'Europe/Moscow')"
-	rows, err := Conn.Query(execStr)
+	execStr := "SELECT dateTime,paramName,paramValue,message FROM errors WHERE datetime BETWEEN $1 AND $2"
+	rows, err := Conn.Query(execStr,dateStart,dateEnd)
 	if err != nil {
 		fmt.Println("" + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		panic(err)
@@ -261,6 +261,7 @@ func GetErrors(dateStart,dateEnd string)[]model.Error{
 			fmt.Println(err)
 		}
 		criticalErrors = append(criticalErrors,criticalError)
+		fmt.Println(dateTime,paramName)
 	}
 
 	return criticalErrors
