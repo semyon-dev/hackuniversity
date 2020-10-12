@@ -10,6 +10,11 @@
 * Gorilla websockets
 * JS OPC UA
 
+## Смежные проекты
+
+* [Frontend (React)](https://github.com/dchudik/hackuniversity2020)
+* [Mobile (Android, kotlin)](https://github.com/GranPecador/BiocadProject)
+
 # Микросервисы
 ## pusher
 `go run pusher/main.go` \
