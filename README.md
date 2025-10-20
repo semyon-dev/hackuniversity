@@ -1,7 +1,8 @@
 # hackuniversity 2020
-Команда: time walkers
 
-# Используемые технологии
+Team: time walkers (origin dev), task by BIOCAD
+
+# Stack
 * Go v1.14
 * Clickhouse
 * OPC UA Simulator
@@ -10,7 +11,7 @@
 * Gorilla websockets
 * JS OPC UA
 
-## Смежные проекты
+## Other parts
 
 * [Frontend (React)](https://github.com/dchudik/hackuniversity2020)
 * [Mobile (Android, kotlin)](https://github.com/GranPecador/BiocadProject)
